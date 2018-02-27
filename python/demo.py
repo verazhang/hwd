@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import re  
 import string
-import pymongo
+from pymongo import  MongoClient as MC
   
 def earse(strline,ch) :  
     left = 0  
@@ -36,7 +36,7 @@ for trIter in trs :
                         else :  
                                 pass  
         print
-conn = pymongo.MongoClient('mongodb://localhost:27017/')
+conn = MC('mongodb://localhost:27017/')
 db = conn.mydb # 连接数据库名 
 db.col.insert({"accout":21,"user_name":"xiao"})
 for item in db.col.find():
