@@ -1,0 +1,190 @@
+body.noscroll {
+	overflow: hidden;
+}
+
+.ivu-layout,
+.ivu-layout-header,
+.ivu-layout-sider {
+	background-color: transparent;
+}
+
+.layout {
+	border: 1px solid #d7dde4;
+	background: #f5f7f9;
+	position: relative;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.layout-logo {
+	width: 280px;
+	height: 44px;
+	line-height: 46px;
+	float: left;
+	position: relative;
+	top: 10px;
+	left: 0;
+	padding-left: 64px;
+	background-image: url('../images/logo.png');
+	background-position: left center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	font-size: 22px;
+	white-space: nowrap;
+}
+
+.layout-nav {
+	width: 420px;
+	margin: 0 auto;
+	margin-right: 20px;
+}
+
+.ivu-layout-header {
+	padding: 0;
+}
+
+.ivu-menu.ivu-menu-light.ivu-menu-horizontal {
+	padding: 0 50px;
+	padding-left: 24px;
+}
+
+.ivu-menu-vertical .ivu-menu-item,
+.ivu-menu-vertical .ivu-menu-submenu-title {
+	padding-right: 11px;
+}
+
+.ivu-layout-content {
+	padding-left: 11px;
+}
+
+.layout-footer-center {
+	text-align: center;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+}
+
+.ivu-layout-footer {
+	padding: 11px;
+}
+
+.ivu-input-wrapper {
+	width: 80%;
+	font-size: 14px;
+}
+
+.ivu-input {
+	height: 38px;
+}
+
+.model-search .ivu-form-item-label {
+	font-size: 14px;
+}
+
+.ivu-select {
+	width: 200px;
+	text-align: left;
+}
+
+.model-search .ivu-btn {
+	width: 60px;
+}
+
+.ivu-icon-ios-search {
+	font-size: 22px;
+}
+
+.doc-item {
+	width: 100%;
+	margin-bottom: 12px;
+}
+
+.result-list {
+	margin: auto;
+	padding-top: 22px;
+}
+
+.ivu-card-extra .doc-item-btn {
+	margin-right: 12px;
+	font-size: 18px;
+}
+
+.ivu-card-body {
+	padding-bottom: 3px;
+	padding-left: 11px;
+}
+
+.ivu-card-head {
+	padding: 11px 8px;
+}
+
+.doc-item-footer {
+	display: inline-block;
+	margin-top: 12px;
+}
+
+.ivu-page {
+	margin-top: 22px;
+	margin-bottom: 22px;
+	text-align: right;
+}
+
+.model-add {
+	width: 80%;
+	text-align: left;
+	overflow: auto;
+	overflow-x: hidden;
+}
+
+.ivu-modal {
+	width: 80% !important;
+}
+
+.edui-container {
+	width: 100% !important;
+}
+
+.result-doc .ivu-breadcrumb {
+	margin: 11px !important;
+}
+
+.model-search .ivu-form-item {
+	margin-bottom: 0;
+}
+
+.ivu-select-dropdown {
+	z-index: 901;
+}
+
+.result-doc,
+.result-list {
+	margin-top: 11px;
+	margin-right: 11px;
+}
+
+.result-doc>.ivu-layout {
+	border: 1px solid #dddee1;
+}
+
+.layout-nav .ivu-breadcrumb {
+	text-align: right;
+}
+
+.result-doc .ivu-layout-content {
+	background-color: #dddee1;
+}
+
+.layout-nav .ivu-breadcrumb-item-link {
+	text-decoration: underline;
+	color: #57a3f3;
+}
+
+.ivu-menu-vertical .ivu-menu-item-group-title {
+	padding-left: 16px;font-weight: bold;
+}
+
+.ivu-menu-item-group .ivu-menu-item {
+	padding-left: 42px;
+}.result-doc .ivu-layout-sider-children{
+	border-right:1px solid #dddee1;
+}
