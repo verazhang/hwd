@@ -8,36 +8,62 @@ from bs4 import BeautifulSoup
 import urllib.request
 import re  
 import string
-from pymongo import  MongoClient as MC
-  
-def earse(strline,ch) :  
-    left = 0  
-    right = strline.find(ch)  
-      
-    while right !=-1 :  
-            strline = strline.replace(ch,'')  
-            right = strline.find(ch)  
-    return strline  
+from xml.etree import ElementTree
+#from pymongo import  MongoClient as MC
+#console.log(j, h, c, l, b, a, null, k)
+#1.2.1 30002949_02_10003 ne40e_troublecase_zh(troublecase)/ne/dc_ne_trouble_100429.html EDOC100007976930002949 02 null null 单板无法注册故障处理
+#<topic id="30002949_02_10003" url="ne40e_troublecase_zh(troublecase)/ne/dc_ne_trouble_100429.html" txt="单板无法注册故障处理" libId="30002949" libVersion="02" sub="1"/>
+#待添加函数，获取版本号
+def getTocUrl(j, i, c, l, b, a, g, k):
+    basePath = '/hedex/'
+    f = ""
+    if c != '':
+        f = c.replace("%", "%25")
+        f = f.replace("+", "%2B")
+        f = f.replace("#", "%23")
+        f = f.replace("&", "%26")
+    urlSeparator = '/'
+    e = "pages/"
+    h = "resources/"
+    docid = 'EDOC1000079769'
+    if g == True:
+        h = ""
+    d = [basePath, e, l, urlSeparator, '02', urlSeparator, l, urlSeparator, b, urlSeparator, h, f, "?ft=0&fe=10", "&hib=", j, "&id=", i, "&text=", urllib.request.quote(urllib.request.quote(k)), "&docid=", docid]
+    print("getTocUrl:"+"".join(d))
+    return "".join(d)
+
+def print_node(node):  
+    print("======================")
+    print("node.attrib:%s" % node.attrib) 
+    print("node.attrib['libId']:%s" % node.attrib['libId'])
+
+def getsubmenu(libid,toclib,topicid,hib,libv) :  
+    muneUrl =r'http://support.huawei.com/hedex/navi/navi.do?libId='+libid+'&libVersion=02&tocLib='+toclib+'&tocV=02&hib='+hib+'&topicId='+topicid
+    muneContent = urllib.request.urlopen(muneUrl).read()   
+    muneSoup = ElementTree.fromstring(muneContent)
+    lst_node = muneSoup.getiterator("topic")
+    for idx,node in enumerate(lst_node):  
+        print_node(node)
+        getTocUrl(hib+'.%d'%(idx+1),topicid,node.attrib['url'],libid,libv,'','',node.attrib['txt'])
+    return  
   
 url = r"http://support.huawei.com/hedex/hdx.do?docid=EDOC1000079769"  
-resContent = urllib.request.urlopen(url).read()  
-#resContent = resContent.decode('gb18030').encode('utf8')  
-soup = BeautifulSoup(resContent)  
-print(soup('title')[0].string)  
-tab= soup.findAll('table')  
-trs = tab[len(tab)-1].findAll('tr')  
-for trIter in trs :  
-        tds = trIter.findAll('td')  
-        for tdIter in tds :  
-                span = tdIter('span')  
-                for i in range(len(span)) :  
-                        if span[i].string :  
-                                print(earse(span[i].string,' ').strip()), 
-                        else :  
-                                pass  
+resContent = urllib.request.urlopen(url).read()   
+soup = BeautifulSoup(resContent,"html.parser")  
+ul= soup.findAll(id='rootUL')  
+lis = ul[len(ul)-1].findAll('li')
+for liIter in lis : 
+        print("********************************************************")
+        print(liIter['id'],liIter['hib'],liIter['libid'],liIter['libv'])
+        aTag = liIter.findAll('a')  
+        for aIter in aTag :  
+                print(aIter.string,'http://support.huawei.com'+aIter['href'])
+        if liIter['sub'] == '1':
+           getsubmenu(liIter['libid'],liIter['libid'],liIter['id'],liIter['hib'],liIter['libv'])
         print
-conn = MC('mongodb://localhost:27017/')
-db = conn.mydb # 连接数据库名 
-db.col.insert({"accout":21,"user_name":"xiao"})
-for item in db.col.find():
-    print(item)
+
+#conn = MC('mongodb://localhost:27017/')
+#db = conn.mydb # 连接数据库名 
+#db.col.insert({"accout":21,"user_name":"xiao"})
+#for item in db.col.find():
+#    print(item)
