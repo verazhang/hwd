@@ -15,3 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('mongo','MongoController@index');
+Route::get('test','ProductController@test');
+Route::get('product','ProductController@index');
+Route::get('product/add','ProductController@add');
+Route::get('product/remove/{code}','ProductController@remove');
