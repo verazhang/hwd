@@ -154,3 +154,8 @@ def main():
     
 if __name__ == '__main__':
    main()
+
+
+#re = urllib2.Request(url)  
+#resouce = urllib2.urlopen(re).read()  
+#open("wall.jpg","wb").write(resouce)
