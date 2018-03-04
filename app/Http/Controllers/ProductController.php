@@ -13,12 +13,12 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    private $dbSource = '';
+    protected $tableName = 'product';
+    protected $dbSource = '';
 
-    private function getDBSource()
+    public function __construct()
     {
-        $dbName = env('DB_DATABASE');
-        $this->dbSource = Mongodb::connectionMongodb($dbName);
+        $this->dbSource = Mongodb::connectionMongodb($this->tableName);
         return $this->dbSource;
     }
 
@@ -39,7 +39,7 @@ class ProductController extends Controller
 
     private function search($code = '')
     {
-        $dbs = $this->getDBSource();
+        $dbs = $this->dbSource;
         if ($code) {
             $dbs = $dbs->where('code', $code);
         }
@@ -60,8 +60,7 @@ class ProductController extends Controller
             return false;
         }
 
-        $dbs = $this->getDBSource();
-        $result = $dbs->insert(['code'=>$code, 'page'=>$page, 'time'=>time()]);
+        $result = $this->dbSource->insert(['code'=>$code, 'page'=>$page, 'time'=>time()]);
         dd($result);
         return $result;
     }
@@ -77,8 +76,7 @@ class ProductController extends Controller
             return false;
         }
 
-        $dbs = $this->getDBSource();
-        $result = $dbs->where('code', $code)->delete();
+        $result = $this->dbSource->where('code', $code)->delete();
         dd($result);
         return $result ? true : false;
     }
@@ -95,8 +93,7 @@ class ProductController extends Controller
         if (!$code || !$page) {
             return false;
         }
-        $dbs = $this->getDBSource();
-        $result = $dbs->where('code', $code)->update(['page'=>$page]);
+        $result = $this->dbSource->where('code', $code)->update(['page'=>$page]);
         return $result;
     }
 }
