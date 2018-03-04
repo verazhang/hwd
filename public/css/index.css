@@ -194,10 +194,14 @@ body.noscroll {
 
 .doc-nav-tree {
 	padding-left: 8px;
-}.ivu-tree-title-selected, .ivu-tree-title-selected:hover{
+	overflow: auto;
+}
+
+.ivu-tree-title-selected,
+.ivu-tree-title-selected:hover {
 	font-weight: bold;
-    border-radius: 0;
-    text-decoration: underline;
-    background-color: transparent;
-    color: #2d8cf0;
+	border-radius: 0;
+	text-decoration: underline;
+	background-color: transparent;
+	color: #2d8cf0;
 }
