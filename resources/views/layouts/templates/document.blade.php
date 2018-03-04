@@ -1,6 +1,6 @@
 <template>
 	<layout>
-		<sider hide-trigger>
+		<sider hide-trigger class="doc-nav-tree">
 			<tree :data="item.tree" :style="{height:layoutContentHeight-38-11-2-11+'px'}"></tree>
 		</sider>
 		<layout>
@@ -15,9 +15,7 @@
 					Layout
 				</breadcrumb-item>
 			</breadcrumb>
-			<i-content :style="{padding: '0 11px', minHeight: '280px'}">
-				Content
-			</i-content>
+			<i-content class="doc-content" v-html="item.content.content" :style="{padding: '0 11px', minHeight: '280px'}"></i-content>
 		</layout>
 	</layout>
 </template>

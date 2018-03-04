@@ -180,11 +180,24 @@ body.noscroll {
 }
 
 .ivu-menu-vertical .ivu-menu-item-group-title {
-	padding-left: 16px;font-weight: bold;
+	padding-left: 16px;
+	font-weight: bold;
 }
 
 .ivu-menu-item-group .ivu-menu-item {
 	padding-left: 42px;
-}.result-doc .ivu-layout-sider-children{
-	border-right:1px solid #dddee1;
+}
+
+.result-doc .ivu-layout-sider-children {
+	border-right: 1px solid #dddee1;
+}
+
+.doc-nav-tree {
+	padding-left: 8px;
+}.ivu-tree-title-selected, .ivu-tree-title-selected:hover{
+	font-weight: bold;
+    border-radius: 0;
+    text-decoration: underline;
+    background-color: transparent;
+    color: #2d8cf0;
 }

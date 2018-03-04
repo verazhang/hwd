@@ -3,6 +3,7 @@
 @section('css')
 <link rel="stylesheet" type="text/css"  href="./js/umeditor/themes/default/css/umeditor.css" />
 <link rel="stylesheet" type="text/css" href="./css/index.css" />
+<link rel="stylesheet" type="text/css" href="./css/commonltr.css" />
 @endsection
 @section('content')
 <section class="app">
@@ -60,6 +61,8 @@
 <script src="./js/umeditor/umeditor.min.js"></script>
 <script src="./js/umeditor/umeditor.config.js"></script>
 <script src="./js/mock/mock-min.js"></script>
+<script src="./js/tree.js"></script>
+<script src="./js/docs.js"></script>
 <script>
 seajs.use('./js/index.js', function(model) {});
 </script>

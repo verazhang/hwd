@@ -117,8 +117,16 @@ def getUrlContent(cUrl):
         cUrl = 'http://support.huawei.com' + cUrl
     cResContent = urllib.request.urlopen(cUrl).read()   
     cSoup = BeautifulSoup(cResContent,"html.parser")  
-    strHtml= cSoup('html')
-#    print('抓取网页长度%d'%len(strHtml)+'\r')
+    strHtml= cSoup('body')
+#   删除评论区域信息
+    strHtml.find('iframe').extract()
+#   删除版本信息
+    strHtml.find('div',class_='hrcopyright').extract()
+    strHtml.find('div',class_='hwcopyright').extract()
+#   删除其余多余文档内容
+    strHtml.find(id="fbimgDiv").extract()
+    strHtml.find('script').extract()
+#   print('抓取网页长度%d'%len(strHtml)+'\r')
     if len(strHtml)>0 :
        return strHtml[0].prettify()
     return ''
