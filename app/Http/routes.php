@@ -19,3 +19,8 @@ Route::get('test','ProductController@test');
 Route::get('product','ProductController@index');
 Route::get('product/add','ProductController@add');
 Route::get('product/remove/{code}','ProductController@remove');
+
+Route::get('document/get/{docid}', 'DocumentController@get');
+Route::get('document/content/{contentid}', 'DocumentController@getContent');
+Route::get('document/type', 'DocumentController@getTypeList');
+Route::get('document/search', 'DocumentController@search');
