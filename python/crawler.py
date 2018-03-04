@@ -11,11 +11,12 @@ from bs4 import BeautifulSoup
 import urllib.request
 import scipy as sp
 import string
+import json
 import time
 import uuid
 import re
 
-_DOC_ID='EDOC1000079769'
+_DOC_ID=['EDOC1000036635']
 _DATABASE_NAME ='knl'
 _DOC_CONTENT = []
 
@@ -34,7 +35,7 @@ def ModelProductDoc(docid,proid,pro,user_id):
             'updated_at':GetNowTime()
         }
 
-def ModelDocTreeNode(title,targetid,href,ohref,libid,libversion,toclib,tocv,hib,topicid):
+def ModelDocTreeNode(title,targetid,href,ohref,libid,libversion,toclib,tocv,hib,topicid,sub):
     return {'_id':cUIDStr(),
             'title':title,
             'targetid':targetid,
@@ -46,6 +47,7 @@ def ModelDocTreeNode(title,targetid,href,ohref,libid,libversion,toclib,tocv,hib,
             'tocv':tocv,
             'hib': hib,
             'topicid':topicid,
+            'sub':sub,
             'children':[]
           }
 
@@ -67,21 +69,20 @@ def cUIDStr():
 #    return "".join([str(uuid.uuid1()),"-", "%f"%time.time(),"-","%f"%sp.rand()])
     return "".join([str(uuid.uuid1()),"-","%f"%sp.rand()])
 
-def getTocUrl(j, i, c, l, b, a, g, k):
+def getTocUrl(docid,hib, libid, url, libv, a, g, title):
     basePath = '/hedex/'
     f = ""
-    if c != '':
-        f = c.replace("%", "%25")
+    if url != '':
+        f = url.replace("%", "%25")
         f = f.replace("+", "%2B")
         f = f.replace("#", "%23")
         f = f.replace("&", "%26")
     urlSeparator = '/'
     e = "pages/"
     h = "resources/"
-    docid = 'EDOC1000079769'
     if g == True:
         h = ""
-    d = [basePath, e, l, urlSeparator, '02', urlSeparator, l, urlSeparator, b, urlSeparator, h, f, "?ft=0&fe=10", "&hib=", j, "&id=", i, "&text=", urllib.request.quote(urllib.request.quote(k)), "&docid=", docid]
+    d = [basePath, e, libid, urlSeparator,hib, urlSeparator,libid, urlSeparator,libv, urlSeparator, h, f, "?ft=0&fe=10", "&hib=", hib, "&id=", libid, "&text=", urllib.request.quote(urllib.request.quote(title)), "&docid=", docid]
 #   print("getTocUrl:"+"".join(d))
     return "".join(d)
 
@@ -90,18 +91,25 @@ def print_node(node):
     print("node.attrib:%s" % node.attrib) 
     print("node.attrib['libId']:%s" % node.attrib['libId'])
 
-def getSubMenu(libid,toclib,topicid,hib,libv,KnlDocTreeNode) :  
-    muneUrl =r'http://support.huawei.com/hedex/navi/navi.do?libId='+libid+'&libVersion=02&tocLib='+toclib+'&tocV=02&hib='+hib+'&topicId='+topicid
+def getSubMenu(docid,libid,toclib,topicid,hib,libv,KnlDocTreeNode) :  
+    muneUrl =r'http://support.huawei.com/hedex/navi/navi.do?libId='+libid+'&libVersion='+libv+'&tocLib='+toclib+'&tocV='+libv+'&hib='+hib+'&topicId='+topicid
+    print('获取子菜单',muneUrl)
     muneContent = urllib.request.urlopen(muneUrl).read()   
     muneSoup = ElementTree.fromstring(muneContent)
     lst_node = muneSoup.getiterator("topic")
     for idx,node in enumerate(lst_node):  
-        changUrl = getTocUrl(hib+'.%d'%(idx+1),topicid,node.attrib['url'],libid,libv,'','',node.attrib['txt'])
+        changUrl = getTocUrl(docid,getHib(hib,idx),topicid,node.attrib['url'],libv,'','',node.attrib['txt'])
         docc = ModelDocContent(getUrlContent(changUrl),'5406')
         targetid = getTargetID(docc)
         if targetid !='':
            _DOC_CONTENT.append(docc)
-        KnlDocTreeNode['children'].append(ModelDocTreeNode(node.attrib['txt'],targetid,changUrl,node.attrib['url'],node.attrib['libId'],node.attrib['libVersion'],node.attrib['libId'],node.attrib['libVersion'],hib,node.attrib['id']))
+        subDocTreeNode = ModelDocTreeNode(node.attrib['txt'],targetid,changUrl,node.attrib['url'],node.attrib['libId'],node.attrib['libVersion'],node.attrib['libId'],node.attrib['libVersion'],hib,node.attrib['id'],node.attrib['sub'])
+        print(node.attrib['txt'],node.attrib['sub'],node.attrib['libId'],node.attrib['libId'],node.attrib['id'],getHib(hib,idx),node.attrib['libVersion'])
+        if node.attrib['sub'] == '1':
+            print('获取下一级菜单\r')
+#            getSubMenu(node.attrib['libId'],node.attrib['libId'],node.attrib['id'],getHib(hib,idx),node.attrib['libVersion'],subDocTreeNode)
+            getSubMenu(docid,libid,toclib,node.attrib['id'],getHib(hib,idx),node.attrib['libVersion'],subDocTreeNode)
+        KnlDocTreeNode['children'].append(subDocTreeNode)
     return 
 
 def getUrlContent(cUrl):
@@ -120,37 +128,53 @@ def getTargetID(docc):
        return ''
     return docc['_id']
 
+def getHib(hib,idx):
+	return hib+'.%d'%(idx+1)
+
 def insertData(jsonObj,table):
     _DB_CONN[table].insert(jsonObj)
+
+def crawlerUrl(docid):
+    url = r"http://support.huawei.com/hedex/hdx.do?docid="+docid
+    resContent = urllib.request.urlopen(url).read()   
+    soup = BeautifulSoup(resContent,"html.parser")  
+    ul= soup.findAll(id='rootUL')  
+    lis = ul[len(ul)-1].findAll('li')
+    title = soup.find(id="libName_A_link")
+    print(title.string)
+    KnlDoc = ModelProductDoc(docid,title.string,title.string,'5406')
+    for liIter in lis : 
+        print("********************************************************")
+        print(liIter['id'],liIter['hib'],liIter['libid'],liIter['libv'])
+        aTag = liIter.findAll('a')
+        for aIter in aTag :  
+            print(aIter.string,'http://support.huawei.com'+aIter['href'],)
+            docc = ModelDocContent(getUrlContent(aIter['href']),'5406')
+            targetid = getTargetID(docc)
+            if targetid !='':
+                _DOC_CONTENT.append(docc)
+            KnlDocTreeNode = ModelDocTreeNode(aIter.string,targetid,aIter['href'],aIter['href'],liIter['libid'],liIter['libv'],liIter['libid'],liIter['libv'],liIter['hib'],liIter['id'],liIter['sub'])
+            KnlDoc['navtree'].append(KnlDocTreeNode)
+        if liIter['sub'] == '1':
+            try:
+               getSubMenu(docid,liIter['libid'],liIter['libid'],liIter['id'],liIter['hib'],liIter['libv'],KnlDocTreeNode)
+            except:
+               print('获取子菜单报错')
+        print("抓取网页文档*********************************************",len(_DOC_CONTENT))
+    insertData(KnlDoc,'doc')
+    insertData(_DOC_CONTENT,'doccontent')
+    with open("tree.json", "w") as trf:
+         json.dumps(KnlDoc, trf)
+    with open("doc.json", "w") as docf:
+         json.dumps(_DOC_CONTENT, docf)
 
 def main():
     conn = MC('mongodb://localhost:27017/')
     global _DB_CONN 
     _DB_CONN = conn[_DATABASE_NAME] # 连接数据库名 
-    url = r"http://support.huawei.com/hedex/hdx.do?docid="+_DOC_ID
-    resContent = urllib.request.urlopen(url).read()   
-    soup = BeautifulSoup(resContent,"html.parser")  
-    ul= soup.findAll(id='rootUL')  
-    lis = ul[len(ul)-1].findAll('li')
-    KnlDoc = ModelProductDoc(_DOC_ID,'NE40E&80E&5000E','NE40E&80E&5000E','5406')
-    for liIter in lis : 
-#        print("********************************************************")
-#        print(liIter['id'],liIter['hib'],liIter['libid'],liIter['libv'])
-        aTag = liIter.findAll('a')
-        for aIter in aTag :  
-#            print(aIter.string,'http://support.huawei.com'+aIter['href'],)
-            docc = ModelDocContent(getUrlContent(aIter['href']),'5406')
-            targetid = getTargetID(docc)
-            if targetid !='':
-                _DOC_CONTENT.append(docc)
-            KnlDocTreeNode = ModelDocTreeNode(aIter.string,targetid,aIter['href'],aIter['href'],liIter['libid'],liIter['libv'],liIter['libid'],liIter['libv'],liIter['hib'],liIter['id'])
-            KnlDoc['navtree'].append(KnlDocTreeNode)
-        if liIter['sub'] == '1':
-            getSubMenu(liIter['libid'],liIter['libid'],liIter['id'],liIter['hib'],liIter['libv'],KnlDocTreeNode)
-        
-        print("抓取网页文档*********************************************",len(_DOC_CONTENT))
-    insertData(KnlDoc,'doc')
-    insertData(_DOC_CONTENT,'doccontent')
+    for docid in _DOC_ID:
+        crawlerUrl(docid)
+    
     
 if __name__ == '__main__':
    main()
