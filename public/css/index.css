@@ -146,6 +146,7 @@ body.noscroll {
 
 .result-doc .ivu-breadcrumb {
 	margin: 11px !important;
+	border-bottom: 1px solid #dddee1;
 }
 
 .model-search .ivu-form-item {
@@ -171,7 +172,8 @@ body.noscroll {
 }
 
 .result-doc .ivu-layout-content {
-	background-color: #dddee1;
+	/*background-color: #dddee1;*/
+	overflow: auto;
 }
 
 .layout-nav .ivu-breadcrumb-item-link {
@@ -204,4 +206,14 @@ body.noscroll {
 	text-decoration: underline;
 	background-color: transparent;
 	color: #2d8cf0;
+}
+
+.doc-breadcrumb-list>span:after {
+	content: "/";
+	margin: 0 8px;
+	color: #dddee1;
+}
+
+.doc-breadcrumb-list>span:last-child:after {
+	content: none;
 }

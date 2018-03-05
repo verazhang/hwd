@@ -91,6 +91,25 @@ def print_node(node):
     print("node.attrib:%s" % node.attrib) 
     print("node.attrib['libId']:%s" % node.attrib['libId'])
 
+def processJson(inputJsonFile):  
+    fin = open(inputJsonFile, 'r')  
+#    fout = open(outputJsonFile, 'w')  
+    for eachLine in fin:  
+        line = eachLine.strip().decode('utf-8')                #去除每行首位可能的空格，并且转为Unicode进行处理  
+        line = line.strip(',')                                 #去除Json文件每行大括号后的逗号  
+        js = None  
+        try:  
+            js = json.loads(line)                              #加载Json文件  
+        except Exception,e:  
+            print 'bad line'  
+            continue
+#对未加载完的数据重新进行加载
+        js["xxx"] = xxx                                        #对您需要修改的项进行修改，xxx表示你要修改的内容  
+        outStr = json.dumps(js, ensure_ascii = False) + ','    #处理完之后重新转为Json格式，并在行尾加上一个逗号  
+#        fout.write(outStr.strip().encode('utf-8') + '\n')      #写回到一个新的Json文件中去  
+    fin.close()                                                #关闭文件  
+#    fout.close()  
+
 def getSubMenu(docid,libid,toclib,topicid,hib,libv,KnlDocTreeNode) :  
     muneUrl =r'http://support.huawei.com/hedex/navi/navi.do?libId='+libid+'&libVersion='+libv+'&tocLib='+toclib+'&tocV='+libv+'&hib='+hib+'&topicId='+topicid
     print('获取子菜单',muneUrl)
@@ -144,6 +163,9 @@ def insertData(jsonObj,table):
 
 def crawlerUrl(docid):
     url = r"http://support.huawei.com/hedex/hdx.do?docid="+docid
+#    proxy=urllib.request.ProxyHandler({'http':proxy_addr})
+#    opener=urllib.request.build_opener(proxy,urllib.request.HTTPHandler)
+#    urllib.request.install_opener(opener)
     resContent = urllib.request.urlopen(url).read()   
     soup = BeautifulSoup(resContent,"html.parser")  
     ul= soup.findAll(id='rootUL')  

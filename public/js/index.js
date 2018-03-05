@@ -13,6 +13,7 @@ define(function(require, exports, module) {
 		autoHeightEnabled: true,
 		initialFrameHeight: 240
 	});
+	var nodeTreeSelectStr = [];
 	/**
 	 * 获取初始化界面配置参数
 	 */
@@ -34,12 +35,15 @@ define(function(require, exports, module) {
 					proModel: '',
 					proModels: getProModelsTestData(),
 					docList: [],
-					layoutContentHeight: avh
+					layoutContentHeight: avh,
+					breadcrumb: [] //文档树节点
 				}
 			},
 			methods: {
 				proChange: function(e) {
 					this.proModel.length > 0 ? (this.keyword = '') : '';
+					this.breadcrumb = [];
+					this.breadcrumb.push(DocTree.pro);
 				},
 				btnSearch: function() {
 					this.keyword.trim().length > 0 ? this.docList = getDocListTestData() : '';
@@ -59,8 +63,19 @@ define(function(require, exports, module) {
 						this.$Message.success('删除成功');
 					}, 2000);
 				},
-				menuSelect:function(){
-					console.log(arguments);
+				menuActive: function() {
+					console.log('菜单选中', arguments);
+				},
+				docMenuSelect: function(node) {
+					var tr = this.$refs.tree;
+					nodeTreeSelectStr = [];
+					getDocMenuTreeNodeSelected(tr);
+					node[0] ? nodeTreeSelectStr.push(node[0].title) : '';
+					if(nodeTreeSelectStr.length > 0) {
+						//清除已经存在的原始数据
+						var bdc = this.breadcrumb.splice(0, 1);
+						this.breadcrumb = bdc.concat(nodeTreeSelectStr);
+					}
 				},
 				renderContent: function(h, {
 					root,
@@ -149,6 +164,20 @@ define(function(require, exports, module) {
 			});
 		}
 		return arr;
+	}
+
+	function getDocMenuTreeNodeSelected($tree) {
+		if($tree && $tree.$children) {
+			var nds = [];
+			$tree.$children.forEach(function($tr) {
+				if($tr.data && $tr.data.expand) {
+					nodeTreeSelectStr.push($tr.data.title);
+					if($tr.$children.length > 0) {
+						getDocMenuTreeNodeSelected($tr);
+					}
+				}
+			});
+		}
 	}
 	/**
 	 * 获取产品型号列表
