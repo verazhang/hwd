@@ -21,9 +21,12 @@ define(function(require, exports, module) {
 		return {
 			data() {
 				return {
+					layoutContentHeight: avh,
 					modal_loading: false,
 					delComfirm: false,
 					modalAdd: false,
+					showDocEdit: false, //是否显示编辑操作
+					activeMenu: '3', //左侧菜单树选中主节点
 					item: { //添加编辑对象
 						ispublish: false, //编辑是否发布
 						title: '', //编辑标题
@@ -31,12 +34,84 @@ define(function(require, exports, module) {
 						tree: DocTree.navtree, //导航树
 						content: doc //内容
 					},
+					//查询部分
 					keyword: '',
-					proModel: '',
+					proModel: 'CE12812',
 					proModels: getProModelsTestData(),
 					docList: [],
-					layoutContentHeight: avh,
-					breadcrumb: [] //文档树节点
+					breadcrumb: [], //文档树节点
+					//单位管理
+					unitTree: DocTree.navtree, //单位树
+					userCols: [{
+							title: '名称',
+							key: 'name'
+						},
+						{
+							title: '年龄',
+							key: 'age'
+						},
+						{
+							title: '地址',
+							key: 'address'
+						}, {
+							title: '操作',
+							key: 'action',
+							width: 150,
+							align: 'center',
+							render: (h, params) => {
+								return h('div', [
+									h('Button', {
+										props: {
+											type: 'primary',
+											size: 'small'
+										},
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												this.show(params.index)
+											}
+										}
+									}, '编辑'),
+									h('Button', {
+										props: {
+											type: 'error',
+											size: 'small'
+										},
+										on: {
+											click: () => {
+												this.remove(params.index)
+											}
+										}
+									}, '删除')
+								]);
+							}
+						}
+					],
+					userList: [{
+							name: 'John Brown',
+							age: 18,
+							address: 'New York No. 1 Lake Park',
+							date: '2016-10-03'
+						},
+						{
+							name: 'Jim Green',
+							age: 24,
+							address: 'London No. 1 Lake Park',
+							date: '2016-10-01'
+						},
+						{
+							name: 'Joe Black',
+							age: 30,
+							address: 'Sydney No. 1 Lake Park',
+							date: '2016-10-02'
+						}
+					], //单位对应的用户
+					unitbreadcrumb: [], //单位面包屑
+					unit: {}, //选中的单位信息
+					showUnitEdit: false,
+					//
 				}
 			},
 			methods: {
@@ -63,7 +138,19 @@ define(function(require, exports, module) {
 						this.$Message.success('删除成功');
 					}, 2000);
 				},
-				menuActive: function() {
+				menuActive: function(menuID) {
+					var ms = menuID.split('-');
+					if(menuID == '1-2') {
+						this.showDocEdit = true;
+					} else {
+						this.showDocEdit = false;
+					}
+					if(menuID == '3-1') {
+						this.showUnitEdit = true;
+					} else {
+						this.showUnitEdit = false;
+					}
+					this.activeMenu = ms[0];
 					console.log('菜单选中', arguments);
 				},
 				docMenuSelect: function(node) {
@@ -76,6 +163,15 @@ define(function(require, exports, module) {
 						var bdc = this.breadcrumb.splice(0, 1);
 						this.breadcrumb = bdc.concat(nodeTreeSelectStr);
 					}
+				},
+				showSelectDoc: function(e) {
+					var tar = e.currentTarget,
+						pro = tar.getAttribute('data-pro');
+					this.proModel = pro;
+				},
+				unitSelected: function(n) {
+					this.unit = n[0];
+					//如果是用户管理就加载用户列表数据
 				},
 				renderContent: function(h, {
 					root,
@@ -154,12 +250,15 @@ define(function(require, exports, module) {
 	 */
 	function getDocListTestData() {
 		var len = Math.random() * 30,
-			arr = [];
+			arr = [],
+			proList = getProList(),
+			plen = proList.length;
 		for(var i = 0; i < len; i++) {
 			arr.push({
 				id: Mock.mock('@id()'),
 				title: Mock.mock('@title'),
 				desc: Mock.mock('@cparagraph'),
+				pro: proList[parseInt(Math.random() * (plen - 1))],
 				date: Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
 			});
 		}
@@ -384,6 +483,11 @@ define(function(require, exports, module) {
 				"family": "OLT",
 				"name": "MA5800系列",
 				"type": "MA5800"
+			},
+			{
+				"family": "交换机",
+				"name": "CloudEngine 12800",
+				"type": "CE12800"
 			},
 			{
 				"family": "交换机",

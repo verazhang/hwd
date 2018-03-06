@@ -5,7 +5,7 @@
 @endsection
 @section('content')
 <section class="app">
-	
+	@include('layouts.templates.document')
 </section>
 @endsection
 @section('script')

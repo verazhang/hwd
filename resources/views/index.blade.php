@@ -35,7 +35,7 @@
 			<sider>
 				@include('layouts.templates.nav-menu')
 			</sider>
-			<i-content>
+			<i-content v-if="activeMenu=='1'">
 				<section :class="['model-search',docList.length>0?'has-result':'']">
 					@include('layouts.templates.search')
 					<section class="result-list" v-if="docList.length>0" :style="{height:layoutContentHeight-38-16-2+'px'}">
@@ -47,6 +47,16 @@
 				</section>
 				@include('layouts.templates.del-comfirm')
 				@include('layouts.templates.edit')
+			</i-content>
+			<i-content v-else-if="activeMenu=='3'">
+				<section class="model-unit">
+					<section class="result-list" v-if="showUnitEdit" :style="{height:layoutContentHeight-38-16-2+'px'}">
+						@include('layouts.templates.unitTree')
+					</section>
+					<section class="result-doc" v-else>
+						@include('layouts.templates.userList')
+					</section>
+				</section>
 			</i-content>
 		</layout>
 		<i-footer class="layout-footer-center">
