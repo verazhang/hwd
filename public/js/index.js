@@ -111,7 +111,11 @@ define(function(require, exports, module) {
 					unitbreadcrumb: [], //单位面包屑
 					unit: {}, //选中的单位信息
 					showUnitEdit: false,
-					//
+					//试题部分
+					qtype:'',//选中题型
+					qtypes:['单选题','多选题','判断题','简答题'],//题型
+					qkeywords:'',//题库管理关键字
+					questionList: [],//题库资料
 				}
 			},
 			methods: {
@@ -119,6 +123,9 @@ define(function(require, exports, module) {
 					this.proModel.length > 0 ? (this.keyword = '') : '';
 					this.breadcrumb = [];
 					this.breadcrumb.push(DocTree.pro);
+				},
+				questionChange: function(e) {
+					this.qtype.length > 0 ? (this.qtypes = '') : '';
 				},
 				btnSearch: function() {
 					this.keyword.trim().length > 0 ? this.docList = getDocListTestData() : '';

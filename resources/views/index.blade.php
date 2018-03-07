@@ -48,6 +48,12 @@
 				@include('layouts.templates.del-comfirm')
 				@include('layouts.templates.edit')
 			</i-content>
+			<i-content v-else-if="activeMenu=='2'">
+				<section class="model-question">
+					@include('layouts.templates.question-bank-search')
+					@include('layouts.templates.question-doc')
+				</section>
+			</i-content>
 			<i-content v-else-if="activeMenu=='3'">
 				<section class="model-unit">
 					<section class="result-list" v-if="showUnitEdit" :style="{height:layoutContentHeight-38-16-2+'px'}">
