@@ -51,7 +51,7 @@
 			<i-content v-else-if="activeMenu=='2'">
 				<section v-if="menuID=='2-1'" class="model-question-bank">
 					@include('layouts.templates.question.question-bank-search')
-					@include('layouts.templates.question.question-doc')
+					@include('layouts.templates.question.question-list')
 				</section>
 				<section v-else-if="menuID=='2-2'" class="model-question">
 					@include('layouts.templates.question.question-bank-search')
@@ -67,10 +67,10 @@
 			</i-content>
 			<i-content v-else-if="activeMenu=='3'">
 				<section class="model-unit">
-					<section class="result-list" v-if="showUnitEdit" :style="{height:layoutContentHeight-38-16-2+'px'}">
+					<section class="model-unit-list" v-if="menuID=='3-1'" :style="{height:layoutContentHeight-38-16-2+'px'}">
 						@include('layouts.templates.unit.unitTree')
 					</section>
-					<section class="result-doc" v-else>
+					<section class="model-user-list" v-else-if="menuID=='3-2'">
 						@include('layouts.templates.unit.userList')
 					</section>
 				</section>

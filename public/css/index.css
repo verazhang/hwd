@@ -94,11 +94,14 @@ body.noscroll {
 	font-size: 22px;
 }
 
-.doc-item {
+.doc-item,.question-item {
 	width: 100%;
 	margin-bottom: 12px;
 }
-
+.question-item .ivu-card-body >p >span{
+	display: inline-block;
+	width: 100%;
+}
 .result-list {
 	margin: auto;
 	padding-top: 22px;
@@ -158,7 +161,7 @@ body.noscroll {
 }
 
 .result-doc,
-.result-list {
+.result-list,.question-item {
 	margin-top: 11px;
 	margin-right: 11px;
 }
@@ -190,7 +193,7 @@ body.noscroll {
 	padding-left: 42px;
 }
 
-.result-doc .ivu-layout-sider-children {
+.ivu-layout-content .ivu-layout-sider-children {
 	border-right: 1px solid #dddee1;
 }
 
@@ -216,4 +219,8 @@ body.noscroll {
 
 .doc-breadcrumb-list>span:last-child:after {
 	content: none;
+}
+
+.ivu-tree {
+	overflow: auto;
 }

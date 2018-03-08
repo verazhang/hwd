@@ -42,18 +42,21 @@ define(function(require, exports, module) {
 					docList: [],
 					breadcrumb: [], //文档树节点
 					//单位管理
-					unitTree: DocTree.navtree, //单位树
+					unitTree: getUnitTree(), //单位树
 					userCols: [{
-							title: '名称',
-							key: 'name'
+							title: '姓名',
+							key: 'username'
 						},
 						{
-							title: '年龄',
-							key: 'age'
+							title: '身份',
+							key: 'type'
 						},
 						{
-							title: '地址',
-							key: 'address'
+							title: '状态',
+							key: 'status'
+						}, {
+							title: '更新时间',
+							key: 'update_at'
 						}, {
 							title: '操作',
 							key: 'action',
@@ -82,7 +85,14 @@ define(function(require, exports, module) {
 										},
 										on: {
 											click: () => {
-												this.remove(params.index)
+												this.$Modal.confirm({
+													title: '删除确认',
+													content: '<p>您确定删除该用户?</p>',
+													onOk: () => {
+														this.removeUser(params.index)
+													},
+													onCancel: () => {}
+												});
 											}
 										}
 									}, '删除')
@@ -90,25 +100,7 @@ define(function(require, exports, module) {
 							}
 						}
 					],
-					userList: [{
-							name: 'John Brown',
-							age: 18,
-							address: 'New York No. 1 Lake Park',
-							date: '2016-10-03'
-						},
-						{
-							name: 'Jim Green',
-							age: 24,
-							address: 'London No. 1 Lake Park',
-							date: '2016-10-01'
-						},
-						{
-							name: 'Joe Black',
-							age: 30,
-							address: 'Sydney No. 1 Lake Park',
-							date: '2016-10-02'
-						}
-					], //单位对应的用户
+					userList: getUnitUserList(), //单位对应的用户
 					unitbreadcrumb: [], //单位面包屑
 					unit: {}, //选中的单位信息
 					showUnitEdit: false,
@@ -116,7 +108,8 @@ define(function(require, exports, module) {
 					qtype: '', //选中题型
 					qtypes: ['单选题', '多选题', '判断题', '简答题'], //题型
 					qkeywords: '', //题库管理关键字
-					questionList: [], //题库资料
+					questionList: getQuestionBank(), //题库资料
+					questionDoc: getQuestionDoc(), //试卷列表
 				}
 			},
 			methods: {
@@ -180,7 +173,11 @@ define(function(require, exports, module) {
 				},
 				unitSelected: function(n) {
 					this.unit = n[0];
+					this.userList = getUnitUserList();
 					//如果是用户管理就加载用户列表数据
+				},
+				removeUser: function() {
+					console.log('删除用户', arguments);
 				},
 				renderContent: function(h, {
 					root,
@@ -310,24 +307,188 @@ define(function(require, exports, module) {
 	 * 构建单位树
 	 */
 	function getUnitTree() {
-		var unitTree = [],
-			len = Mock.mock('@integer(2, 20)'),
-			deep = len = Mock.mock('@integer(1,5)');
-		
+		var deep = Mock.mock('@integer(1,2)');
+		return getRandomUnit(deep);
 	}
 
-	function getRandomUnit() {
-		var len = Mock.mock('@integer(3, 10)'),
+	function getRandomUnit(deep) {
+		var len = Mock.mock('@integer(2, 5)'),
 			units = [];
 		for(var i = 0; i < len; i++) {
 			units.push({
 				"_id": Mock.mock('@string(32)'),
 				"title": Mock.mock('@ctitle(3, 15)'),
 				"unitid": Mock.mock('@string(32)'),
-				"children": []
+				"children": deep >= 0 ? getRandomUnit(deep - 1) : []
 			});
 		}
 		return units;
+	}
+
+	function getUnitUserList() {
+		var len = Mock.mock('@integer(2, 10)'),
+			userList = [];
+		for(var i = 0; i < len; i++) {
+			userList.push({
+				"_id": Mock.mock('@string(32)'),
+				"username": Mock.mock('@cname'),
+				"unitid": '',
+				"type": ['老师', '一般用户'][Mock.mock('@integer(0,1)')],
+				"iadmin": ['是', '否'][Mock.mock('@integer(0,1)')],
+				"status": ['正常', '注销'][Mock.mock('@integer(0,1)')],
+				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
+			});
+		}
+		return userList;
+	}
+
+	function getQuestionBank() {
+		var len = Mock.mock('@integer(2, 50)'),
+			qbs = [],
+			type = '',
+			ops, op;
+		for(var i = 0; i < len; i++) {
+			type = Mock.mock('@integer(0,3)');
+			[ops, op] = getQuestionAnswer(type);
+			if(type == 2) {
+				op = [
+					['正确', '错误'][Mock.mock('@integer(0,1)')]
+				];
+			}
+			qbs.push({
+				"_id": Mock.mock('@string(32)'),
+				"type": type,
+				"type_text": ['单选', '多选', '判断', '问答'][type],
+				"title": Mock.mock('@ctitle(10, 30)'),
+				"content": (type == 0 || type == 1) ? '' : Mock.mock('@cparagraph()'),
+				"options": ops,
+				"option": op.join('、'),
+				"user_id": '',
+				"status": ['删除', '发布', '新建'][Mock.mock('@integer(0,2)')],
+				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
+			});
+		}
+		return qbs;
+	}
+
+	function getQuestionAnswer(type) {
+		var qas = [],
+			qa = [],
+			a = ['A', 'B', 'C', 'D', 'E', 'F'];
+		if(type == 0) {
+			for(var i = 0, len = 4; i < len; i++) {
+				qas.push({
+					'title': Mock.mock('@cparagraph()'),
+					'projectnum': a[i]
+				});
+
+			}
+			qa.push(a[Mock.mock('@integer(1,4)')]);
+		}
+		if(type == 1) {
+			for(var i = 0, len = Mock.mock('@integer(5,6)'); i < len; i++) {
+				qas.push({
+					'title': Mock.mock('@cparagraph()'),
+					'projectnum': a[i]
+				});
+
+			}
+			qa.push(a[Mock.mock('@integer(1,6)')]);
+			qa.push(a[Mock.mock('@integer(1,6)')]);
+			qa.push(a[Mock.mock('@integer(1,6)')]);
+		}
+		return [qas, qa];
+	}
+	/**
+	 * 获取试卷列表
+	 */
+	function getQuestionDoc() {
+		var len = Mock.mock('@integer(2, 50)'),
+			qds = [],
+			qdl = [];
+		for(var i = 0; i < len; i++) {
+			qdl = getQuestionDocList();
+			qds.push({
+				"_id": Mock.mock('@string(32)'),
+				"title": Mock.mock('@ctitle(10, 30)'),
+				"question": qdl,
+				"questiontext": analyQuestionDoc(qdl),
+				"examtime": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"delay": '0',
+				"duration": Mock.mock('@integer(30,120)'),
+				"user_id": '',
+				"status": ['未考试', '考试中', '考试结束', '作废'][Mock.mock('@integer(0,3)')],
+				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
+			});
+		}
+		return qds;
+	}
+	/**
+	 * 获取试题题目列表
+	 */
+	function getQuestionDocList() {
+		var type = Mock.mock('@integer(0,3)'),
+			qdl = [];
+		for(var i = 0, l = 15; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(1,2)'),
+				"type": 2
+			});
+		}
+		for(var i = 0, l = 20; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(1,2)'),
+				"type": 0
+			});
+		}
+		for(var i = 0, l = 10; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(2,5)'),
+				"type": 1
+			});
+		}
+		for(var i = 0, l = 5; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(5,15)'),
+				"type": 3
+			});
+		}
+		return qdl;
+	}
+	/**
+	 * 分析试卷题目
+	 */
+	function analyQuestionDoc(qdl) {
+		var anqdl = {
+			0: {
+				cnt: 0,
+				fraction: 0
+			},
+			1: {
+				cnt: 0,
+				fraction: 0
+			},
+			2: {
+				cnt: 0,
+				fraction: 0
+			},
+			3: {
+				cnt: 0,
+				fraction: 0
+			}
+		};
+		for(var i = 0, l = qdl.length; i < l; i++) {
+			anqdl[qdl[i]['type']]['fraction'] += qdl[i]['fraction'];
+			anqdl[qdl[i]['type']]['cnt']++;
+		}
+		return anqdl;
 	}
 
 	function getProList() {
