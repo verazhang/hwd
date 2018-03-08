@@ -49,18 +49,29 @@
 				@include('layouts.templates.edit')
 			</i-content>
 			<i-content v-else-if="activeMenu=='2'">
-				<section class="model-question">
-					@include('layouts.templates.question-bank-search')
-					@include('layouts.templates.question-doc')
+				<section v-if="menuID=='2-1'" class="model-question-bank">
+					@include('layouts.templates.question.question-bank-search')
+					@include('layouts.templates.question.question-doc')
+				</section>
+				<section v-else-if="menuID=='2-2'" class="model-question">
+					@include('layouts.templates.question.question-bank-search')
+					@include('layouts.templates.question.question-doc')
+				</section>
+				<section v-else-if="menuID=='2-3'" class="model-examination">
+					@include('layouts.templates.question.examination-search')
+					@include('layouts.templates.question.examination')
+				</section>
+				<section v-else-if="menuID=='2-4'" class="model-me">
+					@include('layouts.templates.question.me-examination-list')
 				</section>
 			</i-content>
 			<i-content v-else-if="activeMenu=='3'">
 				<section class="model-unit">
 					<section class="result-list" v-if="showUnitEdit" :style="{height:layoutContentHeight-38-16-2+'px'}">
-						@include('layouts.templates.unitTree')
+						@include('layouts.templates.unit.unitTree')
 					</section>
 					<section class="result-doc" v-else>
-						@include('layouts.templates.userList')
+						@include('layouts.templates.unit.userList')
 					</section>
 				</section>
 			</i-content>

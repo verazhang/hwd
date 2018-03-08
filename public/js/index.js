@@ -27,6 +27,7 @@ define(function(require, exports, module) {
 					modalAdd: false,
 					showDocEdit: false, //是否显示编辑操作
 					activeMenu: '3', //左侧菜单树选中主节点
+					menuID: '', //左侧导航树节点ID
 					item: { //添加编辑对象
 						ispublish: false, //编辑是否发布
 						title: '', //编辑标题
@@ -112,10 +113,10 @@ define(function(require, exports, module) {
 					unit: {}, //选中的单位信息
 					showUnitEdit: false,
 					//试题部分
-					qtype:'',//选中题型
-					qtypes:['单选题','多选题','判断题','简答题'],//题型
-					qkeywords:'',//题库管理关键字
-					questionList: [],//题库资料
+					qtype: '', //选中题型
+					qtypes: ['单选题', '多选题', '判断题', '简答题'], //题型
+					qkeywords: '', //题库管理关键字
+					questionList: [], //题库资料
 				}
 			},
 			methods: {
@@ -146,6 +147,7 @@ define(function(require, exports, module) {
 					}, 2000);
 				},
 				menuActive: function(menuID) {
+					this.menuID = menuID;
 					var ms = menuID.split('-');
 					if(menuID == '1-2') {
 						this.showDocEdit = true;
@@ -303,6 +305,29 @@ define(function(require, exports, module) {
 			proList[i].family == '交换机' ? arr.push(proList[i].type) : '';
 		}
 		return arr;
+	}
+	/**
+	 * 构建单位树
+	 */
+	function getUnitTree() {
+		var unitTree = [],
+			len = Mock.mock('@integer(2, 20)'),
+			deep = len = Mock.mock('@integer(1,5)');
+		
+	}
+
+	function getRandomUnit() {
+		var len = Mock.mock('@integer(3, 10)'),
+			units = [];
+		for(var i = 0; i < len; i++) {
+			units.push({
+				"_id": Mock.mock('@string(32)'),
+				"title": Mock.mock('@ctitle(3, 15)'),
+				"unitid": Mock.mock('@string(32)'),
+				"children": []
+			});
+		}
+		return units;
 	}
 
 	function getProList() {
