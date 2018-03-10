@@ -110,6 +110,13 @@ define(function(require, exports, module) {
 					qkeywords: '', //题库管理关键字
 					questionList: getQuestionBank(), //题库资料
 					questionDoc: getQuestionDoc(), //试卷列表
+					meExaminationStartDate:'',//考试开始时间
+					meExaminationEndDate:'',//考试结束时间
+					meExaminationList: getMeExaminationList(), //我的试卷列表
+					examinaStatus:'考试中',//考试状态选择
+					examinaStatusList:['未开始','考试中','已结束'],//考试状态列表
+					examinakeywords:'',//考试管理关键词
+					examinaList:getMeExaminationList(),//考试管理试卷
 				}
 			},
 			methods: {
@@ -489,6 +496,28 @@ define(function(require, exports, module) {
 			anqdl[qdl[i]['type']]['cnt']++;
 		}
 		return anqdl;
+	}
+	/**
+	 * 获取我的试卷列表
+	 */
+	function getMeExaminationList() {
+		var len = Mock.mock('@integer(1, 50)'),
+			examinaList = [];
+		for(var i = 0; i < len; i++) {
+			examinaList.push({
+				"_id": Mock.mock('@string(32)'),
+				"examinationid": Mock.mock('@cname'),
+				"user_id": '',
+				"title": Mock.mock('@ctitle(3, 15)'),
+				"fraction": Mock.mock('@integer(0, 100)'),
+				"start_time": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"end_time": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"consum": Mock.mock('@integer(1, 50)'),
+				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
+			});
+		}
+		return examinaList;
 	}
 
 	function getProList() {

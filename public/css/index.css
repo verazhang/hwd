@@ -94,14 +94,19 @@ body.noscroll {
 	font-size: 22px;
 }
 
-.doc-item,.question-item {
+.doc-item,
+.question-item,
+.met-item,
+.exl-item {
 	width: 100%;
 	margin-bottom: 12px;
 }
-.question-item .ivu-card-body >p >span{
+
+.question-item .ivu-card-body>p>span {
 	display: inline-block;
 	width: 100%;
 }
+
 .result-list {
 	margin: auto;
 	padding-top: 22px;
@@ -161,7 +166,10 @@ body.noscroll {
 }
 
 .result-doc,
-.result-list,.question-item {
+.result-list,
+.question-item,
+.met-item,
+.exl-item {
 	margin-top: 11px;
 	margin-right: 11px;
 }

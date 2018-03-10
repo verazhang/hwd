@@ -62,6 +62,7 @@
 					@include('layouts.templates.question.examination')
 				</section>
 				<section v-else-if="menuID=='2-4'" class="model-me">
+					@include('layouts.templates.question.me-examination-search')
 					@include('layouts.templates.question.me-examination-list')
 				</section>
 			</i-content>
