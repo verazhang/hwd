@@ -255,7 +255,10 @@ define(function(require, exports, module) {
 					const index = parent.children.indexOf(data);
 					parent.children.splice(index, 1);
 				}
-			}
+			},
+        mounted () {
+            this.menuActive("1-1");
+        }
 		}
 	}
 	/**
