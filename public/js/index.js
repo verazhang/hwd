@@ -312,6 +312,7 @@ define(function(require, exports, module) {
 					} else {
 						const index = root.findIndex(el => el.nodeKey === node.nodeKey);
 						root.splice(index, 1);
+						pVue.item.tree = root;
 					}
 					this.$nextTick(function() {
 						pVue.delTreeNodeComfirm = false;
