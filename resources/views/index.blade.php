@@ -81,7 +81,7 @@
 			2018 &copy; {{env('SYSTEM_NAME')}}
 		</i-footer>
 	</layout>
-	</layout>
+	 <i-spin size="large" fix v-if="spinShow"></i-spin>
 </section>
 @endsection
 @section('script')

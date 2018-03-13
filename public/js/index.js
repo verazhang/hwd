@@ -25,6 +25,7 @@ define(function(require, exports, module) {
 					modal_loading: false,
 					delComfirm: false,
 					modalAdd: false,
+					spinShow:true,//是否显示加载状态
 					showDocEdit: false, //是否显示编辑操作
 					activeMenu: '3', //左侧菜单树选中主节点
 					menuID: '', //左侧导航树节点ID

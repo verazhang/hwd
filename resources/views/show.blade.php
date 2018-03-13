@@ -45,7 +45,6 @@
 			2018 &copy; {{env('SYSTEM_NAME')}}
 		</i-footer>
 	</layout>
-	</layout>
 </section>
 @endsection
 @section('script')
