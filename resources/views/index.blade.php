@@ -85,6 +85,9 @@
 </section>
 @endsection
 @section('script')
+<script src="js/seajs/sea.js"></script>
+<script src="js/vue/vue.min.js"></script>
+<script src="js/vue/iview.min.js"></script>
 <script src="./js/jquery.min.js"></script>
 <script src="./js/umeditor/umeditor.min.js"></script>
 <script src="./js/umeditor/umeditor.config.js"></script>

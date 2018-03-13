@@ -14,6 +14,9 @@
 Route::get('/', function () {
     return view('index');
 });
+Route::get('/doc/{docid}', function () {
+    return view('show');
+});
 Route::get('mongo','MongoController@index');
 Route::get('test','ProductController@test');
 Route::get('product','ProductController@index');

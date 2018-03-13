@@ -177,6 +177,8 @@ define(function(require, exports, module) {
 					var tar = e.currentTarget,
 						pro = tar.getAttribute('data-pro');
 					this.proModel = pro;
+					//弹出新窗口显示详细信息
+					window.open('../doc/'+tar.getAttribute('did'));
 				},
 				unitSelected: function(n) {
 					this.unit = n[0];
