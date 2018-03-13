@@ -45,8 +45,9 @@
 						@include('layouts.templates.document')
 					</section>
 				</section>
-				@include('layouts.templates.del-comfirm')
+				@include('layouts.templates.del-doc-comfirm')
 				@include('layouts.templates.edit')
+				@include('layouts.templates.del-tree-node-comfirm')
 			</i-content>
 			<i-content v-else-if="activeMenu=='2'">
 				<section v-if="menuID=='2-1'" class="model-question-bank">
@@ -81,7 +82,13 @@
 			2018 &copy; {{env('SYSTEM_NAME')}}
 		</i-footer>
 	</layout>
-	 <i-spin size="large" fix v-if="spinShow"></i-spin>
+	 <spin size="large" fix v-if="spinShow"></spin>
+	<div class="ivu-spin ivu-spin-large ivu-spin-fix">
+		<div class="ivu-spin-main">
+			<span class="ivu-spin-dot"></span>
+			<div class="ivu-spin-text"></div>
+		</div>
+	</div>
 </section>
 @endsection
 @section('script')

@@ -3,10 +3,10 @@
 		<p slot="title" v-text="doc.title">
 			<icon type="ios-film-outline"></icon>
 		</p>
-		<a v-if="showDocEdit" class="doc-item-btn" href="#" title="编辑" slot="extra" :didx="idx" @click.prevent="editItem">
+		<a v-if="showDocEdit" class="doc-item-btn" href="#" title="编辑" slot="extra" :didx="idx" @click.prevent="editDocItem">
 			<icon type="ivu-icon ivu-icon-edit"></icon>
 		</a>
-		<a v-if="showDocEdit" class="doc-item-btn" href="#" title="删除" slot="extra" :didx="idx" @click.prevent="delItem">
+		<a v-if="showDocEdit" class="doc-item-btn" href="#" title="删除" slot="extra" :didx="idx" @click.prevent="delDocItem">
 			<icon type="ivu-icon ivu-icon-trash-a"></icon>
 		</a>
 		<p v-text="doc.desc"></p>

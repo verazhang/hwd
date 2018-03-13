@@ -1,9 +1,9 @@
 @extends('layouts.base')
 
 @section('css')
-<link rel="stylesheet" type="text/css"  href="../../js/umeditor/themes/default/css/umeditor.css" />
-<link rel="stylesheet" type="text/css" href="../../css/index.css" />
-<link rel="stylesheet" type="text/css" href="../../css/commonltr.css" />
+<link rel="stylesheet" type="text/css"  href="../js/umeditor/themes/default/css/umeditor.css" />
+<link rel="stylesheet" type="text/css" href="../css/index.css" />
+<link rel="stylesheet" type="text/css" href="../css/commonltr.css" />
 @endsection
 @section('content')
 <section class="app">
@@ -48,13 +48,12 @@
 </section>
 @endsection
 @section('script')
-<script src="../../js/seajs/sea.js"></script>
-<script src="../../js/vue/vue.min.js"></script>
-<script src="../../js/vue/iview.min.js"></script>
-<script src="../../js/jquery.min.js"></script>
-<script src="../../js/mock/mock-min.js"></script>
-<script src="../../js/tree.js"></script>
-<script src="../../js/docs.js"></script>
+<script src="../js/seajs/sea.js"></script>
+<script src="../js/vue/vue.min.js"></script>
+<script src="../js/vue/iview.min.js"></script>
+<script src="../js/mock/mock-min.js"></script>
+<script src="../js/tree.js"></script>
+<script src="../js/docs.js"></script>
 <script>
 seajs.use('../js/show.js', function(model) {});
 </script>

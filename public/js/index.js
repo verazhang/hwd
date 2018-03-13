@@ -13,7 +13,10 @@ define(function(require, exports, module) {
 		autoHeightEnabled: true,
 		initialFrameHeight: 240
 	});
-	var nodeTreeSelectStr = [];
+	//vue加载完成后关闭提示窗口
+	pVue.$nextTick(function() {
+		$('.ivu-spin').hide();
+	});
 	/**
 	 * 获取初始化界面配置参数
 	 */
@@ -23,12 +26,18 @@ define(function(require, exports, module) {
 				return {
 					layoutContentHeight: avh,
 					modal_loading: false,
-					delComfirm: false,
+					delDocComfirm: false, //删除文档操作
+					delTreeNodeComfirm: false, //删除文档树节点
 					modalAdd: false,
-					spinShow:true,//是否显示加载状态
 					showDocEdit: false, //是否显示编辑操作
+					spinShow: false, //加载等待窗口
+					isDocProSelected: false, //文档查询下拉框是否可选
 					activeMenu: '3', //左侧菜单树选中主节点
 					menuID: '', //左侧导航树节点ID
+					newTreeNodeTitle: '', //新增节点标题
+					addNewTreeNodeTitle: false, //增加节点窗口控制显示
+					addParentNode: null, //添加节点原父节点
+					delParentNode: null, //删除节点参数信息
 					item: { //添加编辑对象
 						ispublish: false, //编辑是否发布
 						title: '', //编辑标题
@@ -111,13 +120,13 @@ define(function(require, exports, module) {
 					qkeywords: '', //题库管理关键字
 					questionList: getQuestionBank(), //题库资料
 					questionDoc: getQuestionDoc(), //试卷列表
-					meExaminationStartDate:'',//考试开始时间
-					meExaminationEndDate:'',//考试结束时间
+					meExaminationStartDate: '', //考试开始时间
+					meExaminationEndDate: '', //考试结束时间
 					meExaminationList: getMeExaminationList(), //我的试卷列表
-					examinaStatus:'考试中',//考试状态选择
-					examinaStatusList:['未开始','考试中','已结束'],//考试状态列表
-					examinakeywords:'',//考试管理关键词
-					examinaList:getMeExaminationList(),//考试管理试卷
+					examinaStatus: '考试中', //考试状态选择
+					examinaStatusList: ['未开始', '考试中', '已结束'], //考试状态列表
+					examinakeywords: '', //考试管理关键词
+					examinaList: getMeExaminationList(), //考试管理试卷
 				}
 			},
 			methods: {
@@ -126,70 +135,88 @@ define(function(require, exports, module) {
 					this.breadcrumb = [];
 					this.breadcrumb.push(DocTree.pro);
 				},
-				questionChange: function(e) {
-					this.qtype.length > 0 ? (this.qtypes = '') : '';
-				},
-				btnSearch: function() {
-					this.keyword.trim().length > 0 ? this.docList = getDocListTestData() : '';
-				},
-				editItem: function(e) {
+				//添加文档
+				btnAddDoc: function(e) {
 					this.modalAdd = true;
 					document.body.classList.add('noscroll');
 				},
-				delItem: function(e) {
-					this.delComfirm = true;
+				//题库类型选中切换
+				questionChange: function(e) {
+					this.qtype.length > 0 ? (this.qtypes = '') : '';
 				},
-				del: function() {
+				//文档选中按钮点击事件
+				btnSearch: function() {
+					this.keyword.trim().length > 0 ? this.docList = getDocListTestData() : '';
+				},
+				//编辑文档
+				editDocItem: function(e) {
+					this.modalAdd = true;
+					document.body.classList.add('noscroll');
+				},
+				//删除文档操作提示
+				delDocItem: function(e) {
+					this.delDocComfirm = true;
+				},
+				//删除文档操作
+				delDoc: function() {
 					this.modal_loading = true;
 					setTimeout(() => {
 						this.modal_loading = false;
-						this.delComfirm = false;
+						this.delDocComfirm = false;
 						this.$Message.success('删除成功');
 					}, 2000);
 				},
+				//菜单操作
 				menuActive: function(menuID) {
+					this.spinShow = true;
 					this.menuID = menuID;
 					var ms = menuID.split('-');
-					if(menuID == '1-2') {
-						this.showDocEdit = true;
-					} else {
-						this.showDocEdit = false;
-					}
-					if(menuID == '3-1') {
-						this.showUnitEdit = true;
-					} else {
-						this.showUnitEdit = false;
-					}
+					menuID == '1-2' ? this.showDocEdit = true : this.showDocEdit = false;
+					menuID == '3-1' ? this.showUnitEdit = true : this.showUnitEdit = false;
 					this.activeMenu = ms[0];
-					console.log('菜单选中', arguments);
+					this.$nextTick(function() {
+						this.spinShow = false;
+					});
 				},
+				//文档菜单节点选中事件
 				docMenuSelect: function(node) {
-					var tr = this.$refs.tree;
-					nodeTreeSelectStr = [];
-					getDocMenuTreeNodeSelected(tr);
-					node[0] ? nodeTreeSelectStr.push(node[0].title) : '';
-					if(nodeTreeSelectStr.length > 0) {
-						//清除已经存在的原始数据
+					var tr = this.$refs.tree,
+						selNodes = tr.getSelectedNodes(true);
+					if(selNodes.length > 0) {
+						var pNodes = tr.getSelectedNodeOfParentNodes(selNodes[0]),
+							str = this.getSelectedNodeParentNodesStr(pNodes);
 						var bdc = this.breadcrumb.splice(0, 1);
-						this.breadcrumb = bdc.concat(nodeTreeSelectStr);
+						this.breadcrumb = bdc.concat(str);
 					}
 				},
+				//获取文档节点选中后节点列表标题数组
+				getSelectedNodeParentNodesStr: function(nodes) {
+					var str = [];
+					nodes.forEach(function(el) {
+						str.push(el.node.title);
+					});
+					return str;
+				},
+				//显示文档内容
 				showSelectDoc: function(e) {
 					var tar = e.currentTarget,
 						pro = tar.getAttribute('data-pro');
 					this.proModel = pro;
 					//弹出新窗口显示详细信息
-					window.open('../doc/'+tar.getAttribute('did'));
+					window.open('../doc/' + tar.getAttribute('did'));
 				},
+				//单位选中
 				unitSelected: function(n) {
 					this.unit = n[0];
 					this.userList = getUnitUserList();
 					//如果是用户管理就加载用户列表数据
 				},
+				//删除用户操作
 				removeUser: function() {
 					console.log('删除用户', arguments);
 				},
-				renderContent: function(h, {
+				//编辑文档导航树节点
+				renderDocTree: function(h, {
 					root,
 					node,
 					data
@@ -226,8 +253,31 @@ define(function(require, exports, module) {
 									marginRight: '8px'
 								},
 								on: {
-									click: function() {
-										pVue.appendNode(data)
+									click: function(e) {
+										pVue.addParentNode = data;
+										pVue.addNewTreeNodeTitle = true;
+										pVue.$Modal.confirm({
+											title: '添加节点名称',
+											render: (h) => {
+												return h('Input', {
+													props: {
+														value: pVue.newTreeNodeTitle,
+														autofocus: true,
+														placeholder: '请输入节点名称...'
+													},
+													on: {
+														input: function(e) {
+															pVue.newTreeNodeTitle = e;
+														}
+													}
+												})
+											},
+											onOk: function() {
+												if(pVue.newTreeNodeTitle) {
+													pVue.appendNode(pVue.addParentNode);
+												}
+											}
+										})
 									}
 								}
 							}),
@@ -237,7 +287,8 @@ define(function(require, exports, module) {
 								}),
 								on: {
 									click: function() {
-										pVue.removeNode(root, node, data)
+										pVue.delTreeNodeComfirm = true;
+										pVue.delParentNode = [root, node, data];
 									}
 								}
 							})
@@ -247,22 +298,35 @@ define(function(require, exports, module) {
 				appendNode: function(data) {
 					const children = data.children || [];
 					children.push({
-						title: 'appended node',
+						title: this.newTreeNodeTitle,
 						expand: true
 					});
 					this.$set(data, 'children', children);
 				},
 				removeNode: function(root, node, data) {
 					const parentKey = root.find(el => el === node).parent;
-					const parent = root.find(el => el.nodeKey === parentKey).node;
-					const index = parent.children.indexOf(data);
-					parent.children.splice(index, 1);
+					if(parentKey) {
+						const parent = root.find(el => el.nodeKey === parentKey).node;
+						const index = parent.children.indexOf(data);
+						parent.children.splice(index, 1);
+					} else {
+						const index = root.findIndex(el => el.nodeKey === node.nodeKey);
+						root.splice(index, 1);
+					}
+					this.$nextTick(function() {
+						pVue.delTreeNodeComfirm = false;
+					});
+				},
+				delTreeNode: function() {
+					var root, node, data;
+					pVue.delParentNode && pVue.delParentNode.length > 0 ? ([root, node, data] = pVue.delParentNode, this.removeNode(root, node, data)) : ''
 				}
 			},
-        mounted () {
-            this.menuActive("1-1");
-        }
+			mounted() {
+				this.menuActive("1-1");
+			}
 		}
+
 	}
 	/**
 	 * 获取查询结果数据列表
@@ -283,31 +347,10 @@ define(function(require, exports, module) {
 		}
 		return arr;
 	}
-
-	function getDocMenuTreeNodeSelected($tree) {
-		if($tree && $tree.$children) {
-			var nds = [];
-			$tree.$children.forEach(function($tr) {
-				if($tr.data && $tr.data.expand) {
-					nodeTreeSelectStr.push($tr.data.title);
-					if($tr.$children.length > 0) {
-						getDocMenuTreeNodeSelected($tr);
-					}
-				}
-			});
-		}
-	}
 	/**
 	 * 获取产品型号列表
 	 */
 	function getProModelsTestData() {
-		/*var len = Math.random() * 30,
-			arr = [];
-
-		for(var i = 0; i < len; i++) {
-			arr.push(Mock.mock('@word(10, 50)'));
-		}
-		return arr;*/
 		var proList = getProList(),
 			len = proList.length,
 			arr = [];

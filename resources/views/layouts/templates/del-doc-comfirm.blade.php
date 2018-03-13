@@ -1,5 +1,5 @@
 <template>
-	<modal v-model="delComfirm" width="360">
+	<modal v-model="delDocComfirm" width="360">
 		<p slot="header" style="color:#f60;text-align:left">
 			<icon type="information-circled"></icon>
 			<span>您确定删除该记录?</span>
@@ -10,7 +10,7 @@
 			</p>
 		</div>
 		<div slot="footer">
-			<i-button type="error" size="large" long :loading="modal_loading" @click="del">
+			<i-button type="error" size="large" long :loading="modal_loading" @click="delDoc">
 				删除
 			</i-button>
 		</div>

@@ -4,16 +4,6 @@ define(function(require, exports, module) {
 	avh = avh - 64 - 43;
 	var Component = Vue.extend(getVueConfig());
 	var pVue = new Component().$mount('.app');
-	//pVue.proModel = pVue.proModels[parseInt(Math.random() * pVue.proModels.length) - 1];
-	var um = UM.getEditor('editor', {
-		//imageUrl: serverPath + "imageUp.php",
-		//imagePath: serverPath,
-		lang: /^zh/.test(navigator.language || navigator.browserLanguage || navigator.userLanguage) ? 'zh-cn' : 'en',
-		langPath: UMEDITOR_CONFIG.UMEDITOR_HOME_URL + "lang/",
-		autoHeightEnabled: true,
-		initialFrameHeight: 240
-	});
-	var nodeTreeSelectStr = [];
 	/**
 	 * 获取初始化界面配置参数
 	 */
@@ -23,11 +13,8 @@ define(function(require, exports, module) {
 				return {
 					layoutContentHeight: avh,
 					modal_loading: false,
-					delComfirm: false,
-					modalAdd: false,
 					showDocEdit: false, //是否显示编辑操作
-					activeMenu: '3', //左侧菜单树选中主节点
-					menuID: '', //左侧导航树节点ID
+					isDocProSelected:true,//文档查询下拉框是否可选
 					item: { //添加编辑对象
 						ispublish: false, //编辑是否发布
 						title: '', //编辑标题
@@ -40,227 +27,37 @@ define(function(require, exports, module) {
 					proModel: 'CE12812',
 					proModels: getProModelsTestData(),
 					docList: [],
-					breadcrumb: [], //文档树节点
-					//单位管理
-					unitTree: getUnitTree(), //单位树
-					userCols: [{
-							title: '姓名',
-							key: 'username'
-						},
-						{
-							title: '身份',
-							key: 'type'
-						},
-						{
-							title: '状态',
-							key: 'status'
-						}, {
-							title: '更新时间',
-							key: 'update_at'
-						}, {
-							title: '操作',
-							key: 'action',
-							width: 150,
-							align: 'center',
-							render: (h, params) => {
-								return h('div', [
-									h('Button', {
-										props: {
-											type: 'primary',
-											size: 'small'
-										},
-										style: {
-											marginRight: '5px'
-										},
-										on: {
-											click: () => {
-												this.show(params.index)
-											}
-										}
-									}, '编辑'),
-									h('Button', {
-										props: {
-											type: 'error',
-											size: 'small'
-										},
-										on: {
-											click: () => {
-												this.$Modal.confirm({
-													title: '删除确认',
-													content: '<p>您确定删除该用户?</p>',
-													onOk: () => {
-														this.removeUser(params.index)
-													},
-													onCancel: () => {}
-												});
-											}
-										}
-									}, '删除')
-								]);
-							}
-						}
-					],
-					userList: getUnitUserList(), //单位对应的用户
-					unitbreadcrumb: [], //单位面包屑
-					unit: {}, //选中的单位信息
-					showUnitEdit: false,
-					//试题部分
-					qtype: '', //选中题型
-					qtypes: ['单选题', '多选题', '判断题', '简答题'], //题型
-					qkeywords: '', //题库管理关键字
-					questionList: getQuestionBank(), //题库资料
-					questionDoc: getQuestionDoc(), //试卷列表
-					meExaminationStartDate:'',//考试开始时间
-					meExaminationEndDate:'',//考试结束时间
-					meExaminationList: getMeExaminationList(), //我的试卷列表
-					examinaStatus:'考试中',//考试状态选择
-					examinaStatusList:['未开始','考试中','已结束'],//考试状态列表
-					examinakeywords:'',//考试管理关键词
-					examinaList:getMeExaminationList(),//考试管理试卷
+					breadcrumb: [DocTree.pro], //文档树节点
 				}
 			},
 			methods: {
+				//类型选中切换事件
 				proChange: function(e) {
 					this.proModel.length > 0 ? (this.keyword = '') : '';
 					this.breadcrumb = [];
 					this.breadcrumb.push(DocTree.pro);
 				},
-				questionChange: function(e) {
-					this.qtype.length > 0 ? (this.qtypes = '') : '';
-				},
 				btnSearch: function() {
 					this.keyword.trim().length > 0 ? this.docList = getDocListTestData() : '';
 				},
-				editItem: function(e) {
-					this.modalAdd = true;
-					document.body.classList.add('noscroll');
-				},
-				delItem: function(e) {
-					this.delComfirm = true;
-				},
-				del: function() {
-					this.modal_loading = true;
-					setTimeout(() => {
-						this.modal_loading = false;
-						this.delComfirm = false;
-						this.$Message.success('删除成功');
-					}, 2000);
-				},
-				menuActive: function(menuID) {
-					this.menuID = menuID;
-					var ms = menuID.split('-');
-					if(menuID == '1-2') {
-						this.showDocEdit = true;
-					} else {
-						this.showDocEdit = false;
-					}
-					if(menuID == '3-1') {
-						this.showUnitEdit = true;
-					} else {
-						this.showUnitEdit = false;
-					}
-					this.activeMenu = ms[0];
-					console.log('菜单选中', arguments);
-				},
 				docMenuSelect: function(node) {
-					var tr = this.$refs.tree;
-					nodeTreeSelectStr = [];
-					getDocMenuTreeNodeSelected(tr);
-					node[0] ? nodeTreeSelectStr.push(node[0].title) : '';
-					if(nodeTreeSelectStr.length > 0) {
-						//清除已经存在的原始数据
+					var tr = this.$refs.tree,
+						selNodes = tr.getSelectedNodes(true);
+					if(selNodes.length > 0) {
+						var pNodes = tr.getSelectedNodeOfParentNodes(selNodes[0]),
+							str = this.getSelectedNodeParentNodesStr(pNodes);
 						var bdc = this.breadcrumb.splice(0, 1);
-						this.breadcrumb = bdc.concat(nodeTreeSelectStr);
+						this.breadcrumb = bdc.concat(str);
 					}
 				},
-				showSelectDoc: function(e) {
-					var tar = e.currentTarget,
-						pro = tar.getAttribute('data-pro');
-					this.proModel = pro;
-					//弹出新窗口显示详细信息
-					window.open('../doc/'+tar.getAttribute('did'));
-				},
-				unitSelected: function(n) {
-					this.unit = n[0];
-					this.userList = getUnitUserList();
-					//如果是用户管理就加载用户列表数据
-				},
-				removeUser: function() {
-					console.log('删除用户', arguments);
-				},
-				renderContent: function(h, {
-					root,
-					node,
-					data
-				}) {
-					return h('span', {
-						style: {
-							display: 'inline-block',
-							width: '100%'
-						}
-					}, [
-						h('span', [
-							h('Icon', {
-								props: {
-									type: 'ios-paper-outline'
-								},
-								style: {
-									marginRight: '8px'
-								}
-							}),
-							h('span', data.title)
-						]),
-						h('span', {
-							style: {
-								display: 'inline-block',
-								float: 'right',
-								marginRight: '32px'
-							}
-						}, [
-							h('Button', {
-								props: Object.assign({}, this.buttonProps, {
-									icon: 'ios-plus-empty'
-								}),
-								style: {
-									marginRight: '8px'
-								},
-								on: {
-									click: function() {
-										pVue.appendNode(data)
-									}
-								}
-							}),
-							h('Button', {
-								props: Object.assign({}, this.buttonProps, {
-									icon: 'ios-minus-empty'
-								}),
-								on: {
-									click: function() {
-										pVue.removeNode(root, node, data)
-									}
-								}
-							})
-						])
-					]);
-				},
-				appendNode: function(data) {
-					const children = data.children || [];
-					children.push({
-						title: 'appended node',
-						expand: true
+				getSelectedNodeParentNodesStr: function(nodes) {
+					var str = [];
+					nodes.forEach(function(el) {
+						str.push(el.node.title);
 					});
-					this.$set(data, 'children', children);
-				},
-				removeNode: function(root, node, data) {
-					const parentKey = root.find(el => el === node).parent;
-					const parent = root.find(el => el.nodeKey === parentKey).node;
-					const index = parent.children.indexOf(data);
-					parent.children.splice(index, 1);
+					return str;
 				}
-			},
-        mounted () {
-            this.menuActive("1-1");
-        }
+			}
 		}
 	}
 	/**
@@ -282,20 +79,6 @@ define(function(require, exports, module) {
 		}
 		return arr;
 	}
-
-	function getDocMenuTreeNodeSelected($tree) {
-		if($tree && $tree.$children) {
-			var nds = [];
-			$tree.$children.forEach(function($tr) {
-				if($tr.data && $tr.data.expand) {
-					nodeTreeSelectStr.push($tr.data.title);
-					if($tr.$children.length > 0) {
-						getDocMenuTreeNodeSelected($tr);
-					}
-				}
-			});
-		}
-	}
 	/**
 	 * 获取产品型号列表
 	 */
@@ -314,215 +97,6 @@ define(function(require, exports, module) {
 			proList[i].family == '交换机' ? arr.push(proList[i].type) : '';
 		}
 		return arr;
-	}
-	/**
-	 * 构建单位树
-	 */
-	function getUnitTree() {
-		var deep = Mock.mock('@integer(1,2)');
-		return getRandomUnit(deep);
-	}
-
-	function getRandomUnit(deep) {
-		var len = Mock.mock('@integer(2, 5)'),
-			units = [];
-		for(var i = 0; i < len; i++) {
-			units.push({
-				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(3, 15)'),
-				"unitid": Mock.mock('@string(32)'),
-				"children": deep >= 0 ? getRandomUnit(deep - 1) : []
-			});
-		}
-		return units;
-	}
-
-	function getUnitUserList() {
-		var len = Mock.mock('@integer(2, 10)'),
-			userList = [];
-		for(var i = 0; i < len; i++) {
-			userList.push({
-				"_id": Mock.mock('@string(32)'),
-				"username": Mock.mock('@cname'),
-				"unitid": '',
-				"type": ['老师', '一般用户'][Mock.mock('@integer(0,1)')],
-				"iadmin": ['是', '否'][Mock.mock('@integer(0,1)')],
-				"status": ['正常', '注销'][Mock.mock('@integer(0,1)')],
-				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
-			});
-		}
-		return userList;
-	}
-
-	function getQuestionBank() {
-		var len = Mock.mock('@integer(2, 50)'),
-			qbs = [],
-			type = '',
-			ops, op;
-		for(var i = 0; i < len; i++) {
-			type = Mock.mock('@integer(0,3)');
-			[ops, op] = getQuestionAnswer(type);
-			if(type == 2) {
-				op = [
-					['正确', '错误'][Mock.mock('@integer(0,1)')]
-				];
-			}
-			qbs.push({
-				"_id": Mock.mock('@string(32)'),
-				"type": type,
-				"type_text": ['单选', '多选', '判断', '问答'][type],
-				"title": Mock.mock('@ctitle(10, 30)'),
-				"content": (type == 0 || type == 1) ? '' : Mock.mock('@cparagraph()'),
-				"options": ops,
-				"option": op.join('、'),
-				"user_id": '',
-				"status": ['删除', '发布', '新建'][Mock.mock('@integer(0,2)')],
-				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
-			});
-		}
-		return qbs;
-	}
-
-	function getQuestionAnswer(type) {
-		var qas = [],
-			qa = [],
-			a = ['A', 'B', 'C', 'D', 'E', 'F'];
-		if(type == 0) {
-			for(var i = 0, len = 4; i < len; i++) {
-				qas.push({
-					'title': Mock.mock('@cparagraph()'),
-					'projectnum': a[i]
-				});
-
-			}
-			qa.push(a[Mock.mock('@integer(1,4)')]);
-		}
-		if(type == 1) {
-			for(var i = 0, len = Mock.mock('@integer(5,6)'); i < len; i++) {
-				qas.push({
-					'title': Mock.mock('@cparagraph()'),
-					'projectnum': a[i]
-				});
-
-			}
-			qa.push(a[Mock.mock('@integer(1,6)')]);
-			qa.push(a[Mock.mock('@integer(1,6)')]);
-			qa.push(a[Mock.mock('@integer(1,6)')]);
-		}
-		return [qas, qa];
-	}
-	/**
-	 * 获取试卷列表
-	 */
-	function getQuestionDoc() {
-		var len = Mock.mock('@integer(2, 50)'),
-			qds = [],
-			qdl = [];
-		for(var i = 0; i < len; i++) {
-			qdl = getQuestionDocList();
-			qds.push({
-				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(10, 30)'),
-				"question": qdl,
-				"questiontext": analyQuestionDoc(qdl),
-				"examtime": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"delay": '0',
-				"duration": Mock.mock('@integer(30,120)'),
-				"user_id": '',
-				"status": ['未考试', '考试中', '考试结束', '作废'][Mock.mock('@integer(0,3)')],
-				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
-			});
-		}
-		return qds;
-	}
-	/**
-	 * 获取试题题目列表
-	 */
-	function getQuestionDocList() {
-		var type = Mock.mock('@integer(0,3)'),
-			qdl = [];
-		for(var i = 0, l = 15; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(1,2)'),
-				"type": 2
-			});
-		}
-		for(var i = 0, l = 20; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(1,2)'),
-				"type": 0
-			});
-		}
-		for(var i = 0, l = 10; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(2,5)'),
-				"type": 1
-			});
-		}
-		for(var i = 0, l = 5; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(5,15)'),
-				"type": 3
-			});
-		}
-		return qdl;
-	}
-	/**
-	 * 分析试卷题目
-	 */
-	function analyQuestionDoc(qdl) {
-		var anqdl = {
-			0: {
-				cnt: 0,
-				fraction: 0
-			},
-			1: {
-				cnt: 0,
-				fraction: 0
-			},
-			2: {
-				cnt: 0,
-				fraction: 0
-			},
-			3: {
-				cnt: 0,
-				fraction: 0
-			}
-		};
-		for(var i = 0, l = qdl.length; i < l; i++) {
-			anqdl[qdl[i]['type']]['fraction'] += qdl[i]['fraction'];
-			anqdl[qdl[i]['type']]['cnt']++;
-		}
-		return anqdl;
-	}
-	/**
-	 * 获取我的试卷列表
-	 */
-	function getMeExaminationList() {
-		var len = Mock.mock('@integer(1, 50)'),
-			examinaList = [];
-		for(var i = 0; i < len; i++) {
-			examinaList.push({
-				"_id": Mock.mock('@string(32)'),
-				"examinationid": Mock.mock('@cname'),
-				"user_id": '',
-				"title": Mock.mock('@ctitle(3, 15)'),
-				"fraction": Mock.mock('@integer(0, 100)'),
-				"start_time": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"end_time": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"consum": Mock.mock('@integer(1, 50)'),
-				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
-			});
-		}
-		return examinaList;
 	}
 
 	function getProList() {
