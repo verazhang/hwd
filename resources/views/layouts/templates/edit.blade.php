@@ -2,7 +2,7 @@
 	<modal class="model-add" v-model="modalAdd" :title="item.title||'新增记录'" closable="false">
 		<i-form :label-width="80">
 			<form-item label="标题">
-				<i-input v-model="item.title" placeholder="Enter something..."></i-input>
+				<i-input v-model="item.title" placeholder="请输入标题"></i-input>
 			</form-item>
 			<form-item label="型号">
 				<i-select v-model="proModel" filterable>
@@ -23,7 +23,7 @@
 				<row>
 					<i-col span="6">
 						<form-item prop="date">
-							<tree :data="item.tree" :render="renderContent"></tree>
+							<tree :data="item.tree" :render="renderDocTree"></tree>
 						</form-item>
 					</i-col>
 					<i-col span="18">

@@ -24,7 +24,7 @@
 							张三
 						</breadcrumb-item>
 						<breadcrumb-item to="/components/breadcrumb">
-							<icon type="pound"></icon>
+							<icon type="log-out"></icon>
 							退出
 						</breadcrumb-item>
 					</breadcrumb>
@@ -45,8 +45,9 @@
 						@include('layouts.templates.document')
 					</section>
 				</section>
-				@include('layouts.templates.del-comfirm')
+				@include('layouts.templates.del-doc-comfirm')
 				@include('layouts.templates.edit')
+				@include('layouts.templates.del-tree-node-comfirm')
 			</i-content>
 			<i-content v-else-if="activeMenu=='2'">
 				<section v-if="menuID=='2-1'" class="model-question-bank">
@@ -54,8 +55,7 @@
 					@include('layouts.templates.question.question-list')
 				</section>
 				<section v-else-if="menuID=='2-2'" class="model-question">
-					@include('layouts.templates.question.question-bank-search')
-					@include('layouts.templates.question.question-doc')
+					@include('layouts.templates.question.exam-nav')
 				</section>
 				<section v-else-if="menuID=='2-3'" class="model-examination">
 					@include('layouts.templates.question.examination-search')
@@ -81,17 +81,27 @@
 			2018 &copy; {{env('SYSTEM_NAME')}}
 		</i-footer>
 	</layout>
-	</layout>
+	<spin size="large" fix v-if="spinShow"></spin>
+	<div class="ivu-spin ivu-spin-large ivu-spin-fix">
+		<div class="ivu-spin-main">
+			<span class="ivu-spin-dot"></span>
+			<div class="ivu-spin-text"></div>
+		</div>
+	</div>
 </section>
 @endsection
 @section('script')
+<script src="js/seajs/sea.js"></script>
+<script src="js/vue/vue.min.js"></script>
+<script src="js/vue/iview.min.js"></script>
 <script src="./js/jquery.min.js"></script>
 <script src="./js/umeditor/umeditor.min.js"></script>
 <script src="./js/umeditor/umeditor.config.js"></script>
 <script src="./js/mock/mock-min.js"></script>
-<script src="./js/tree.js"></script>
-<script src="./js/docs.js"></script>
-<script>
-seajs.use('./js/index.js', function(model) {});
-</script>
+<script>seajs.use(['./js/index.js', './js/lib/com.js'], function() {
+	var args = arguments;
+	args[0].init({
+		model: args[1]
+	});
+});</script>
 @endsection

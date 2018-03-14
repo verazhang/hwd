@@ -17,9 +17,6 @@
 	<body>
 		@yield('content')
 	</body>
-	<script src="js/seajs/sea.js"></script>
-	<script src="js/vue/vue.min.js"></script>
-	<script src="js/vue/iview.min.js"></script>
-	<script src="js/mock/mock-min.js"></script>
+	
 	@yield('script')
 </html>
