@@ -364,22 +364,62 @@ define(function(require, exports, module) {
 	 * 构建单位树
 	 */
 	function getUnitTree() {
-		var deep = Mock.mock('@integer(1,2)');
-		return getRandomUnit(deep);
-	}
+		return [{
+			"_id": Mock.mock('@string(32)'),
+			"title": "湖北省公司",
+			"unitid": Mock.mock('@string(32)'),
+			"expand":true,
+			"children": [{
+					"_id": Mock.mock('@string(32)'),
+					"title": "武汉市分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				},
+				{
+					"_id": Mock.mock('@string(32)'),
+					"title": "孝感分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				},
+				{
+					"_id": Mock.mock('@string(32)'),
+					"title": "随州分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				}
+			]
+		}, {
+			"_id": Mock.mock('@string(32)'),
+			"title": "北京公司",
+			"unitid": Mock.mock('@string(32)'),
+			"expand":true,
+			"children": [{
+					"_id": Mock.mock('@string(32)'),
+					"title": "朝阳区分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				},
+				{
+					"_id": Mock.mock('@string(32)'),
+					"title": "西城区分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				},
+				{
+					"_id": Mock.mock('@string(32)'),
+					"title": "东城区分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				},
+				{
+					"_id": Mock.mock('@string(32)'),
+					"title": "海淀区分公司",
+					"unitid": Mock.mock('@string(32)'),
+					"children": []
+				}
+			]
+		}];
 
-	function getRandomUnit(deep) {
-		var len = Mock.mock('@integer(2, 5)'),
-			units = [];
-		for(var i = 0; i < len; i++) {
-			units.push({
-				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(3, 15)'),
-				"unitid": Mock.mock('@string(32)'),
-				"children": deep >= 0 ? getRandomUnit(deep - 1) : []
-			});
-		}
-		return units;
 	}
 
 	function getUnitUserList() {
