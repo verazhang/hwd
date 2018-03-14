@@ -44,3 +44,10 @@ Route::post('exam/delete/{examid}', 'ExamController@delete');
 Route::get('exam/get', 'ExamController@get');
 //我的考试
 Route::get('examresult/get/{user_id?}', 'ExamController@getResult');
+Route::post('examresult/add', 'ExamController@addResult');
+//单位管理
+Route::post('unit/add', 'UnitController@add');
+Route::post('unit/edit/{unitid}', 'UnitController@edit');
+Route::post('unit/delete/{unitid}', 'UnitController@delete');
+Route::get('unit/get', 'UnitController@get');
+

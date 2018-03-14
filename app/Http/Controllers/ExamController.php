@@ -30,7 +30,7 @@ class ExamController extends Controller
 
         $model->setRawAttributes($values);
         $result = $model->save();
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->getBoolResult($result);
     }
 
     public function editContent($content_id)
@@ -47,14 +47,14 @@ class ExamController extends Controller
 
         $model->setRawAttributes($values);
         $result = $model->save();
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->getBoolResult($result);
     }
 
     public function deleteContent($content_id)
     {
         $model = ExamContent::where(['_id'=>$content_id])->first();
         $result = $model->delete();
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->getBoolResult($result);
     }
 
     public function getContent()
@@ -65,7 +65,7 @@ class ExamController extends Controller
 
     public function add()
     {
-        $items = ['title', 'question', 'examtime', 'delay', 'duration'];
+        $items = ['title', 'question', 'examtime', 'delay', 'duration', 'fraction', 'testcnt', 'viewcnt'];
         $values = [];
         foreach ($items as $param) {
             $item = request($param);
@@ -73,6 +73,8 @@ class ExamController extends Controller
                 $values[$param] = $item;
             }
         }
+        $values['delay'] = $values['delay'] ? $values['delay'] : 0;
+        $values['viewcnt'] = $values['viewcnt'] ? $values['viewcnt'] : 0;
 
         $values['status'] = Exam::STATUS_NOT_START;
         //@todo
@@ -81,7 +83,7 @@ class ExamController extends Controller
         $model->setRawAttributes($values);
         $result = $model->save();
 
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->getBoolResult($result);
     }
 
     public function edit($exam_id)
@@ -98,20 +100,41 @@ class ExamController extends Controller
 
         $model->setRawAttributes($values);
         $result = $model->save();
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->getBoolResult($result);
     }
 
     public function delete($exam_id)
     {
         $model = Exam::where(['_id'=>$exam_id])->first();
         $result = $model->delete();
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->getBoolResult($result);
     }
 
     public function get()
     {
         $result = Exam::get();
         return $this->resultJson(self::STATUS_SUCCESS, $result);
+    }
+
+    public function addResult()
+    {
+        $items = ['exampaperid', 'fraction', 'question', 'start_time', 'end_time'];
+        $values = [];
+        foreach ($items as $param) {
+            $item = request($param);
+            if ($item) {
+                $values[$param] = $item;
+            }
+        }
+
+        $values['status'] = Exam::STATUS_END;
+        //@todo
+        $values['user_id'] = 0;
+        $model = new ExamResult();
+        $model->setRawAttributes($values);
+        $result = $model->save();
+
+        return $this->getBoolResult($result);
     }
 
     public function getResult($user_id = 0)

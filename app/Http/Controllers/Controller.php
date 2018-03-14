@@ -27,4 +27,14 @@ class Controller extends BaseController
         $source = ['success' => $success, 'msg' => $message, 'data' => $data];
         return response()->json(array_merge($source, $extra));
     }
+
+    /**
+     * result is bool, return 1 or 0 for resultJson
+     * @param $result true or false
+     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function getBoolResult($result)
+    {
+        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+    }
 }
