@@ -33,12 +33,7 @@
 		</i-header>
 		<layout :style="{height:layoutContentHeight+'px'}">
 			<i-content>
-				<section :class="['model-search',docList.length>0?'has-result':'']">
-					@include('layouts.templates.search')
-					<section class="result-doc" v-if="docList.length == 0 && proModel.length>0">
-						@include('layouts.templates.document')
-					</section>
-				</section>
+				@include('layouts.templates.question.exam-list')
 			</i-content>
 		</layout>
 		<i-footer class="layout-footer-center">
@@ -49,12 +44,14 @@
 @endsection
 @section('script')
 <script src="../js/seajs/sea.js"></script>
+<script src="../js/jquery.min.js"></script>
 <script src="../js/vue/vue.min.js"></script>
 <script src="../js/vue/iview.min.js"></script>
 <script src="../js/mock/mock-min.js"></script>
-<script src="../js/tree.js"></script>
-<script src="../js/docs.js"></script>
-<script>
-seajs.use('../js/examlist.js', function(model) {});
-</script>
+<script>seajs.use(['../js/examlist.js', '../js/lib/com.js'], function() {
+	var args = arguments;
+	args[0].init({
+		model: args[1]
+	});
+});</script>
 @endsection

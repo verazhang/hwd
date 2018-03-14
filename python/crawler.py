@@ -10,11 +10,14 @@ from xml.etree import ElementTree
 from bs4 import BeautifulSoup  
 import urllib.request
 import scipy as sp
+import logging
+import logging.config
 import string
 import json
 import time
 import uuid
 import re
+import os
 
 _DOC_ID=['EDOC1000036635']
 _DATABASE_NAME ='knl'
@@ -83,41 +86,35 @@ def getTocUrl(docid,hib, libid, url, libv, a, g, title):
     if g == True:
         h = ""
     d = [basePath, e, libid, urlSeparator,hib, urlSeparator,libid, urlSeparator,libv, urlSeparator, h, f, "?ft=0&fe=10", "&hib=", hib, "&id=", libid, "&text=", urllib.request.quote(urllib.request.quote(title)), "&docid=", docid]
-#   print("getTocUrl:"+"".join(d))
+    logger.info('二级菜单获取列表参数集%s,%s,%s,%s,%s,%s,%s,%s', docid,hib, libid, url, libv, a, g, title)
     return "".join(d)
-
-def print_node(node):  
-    print("======================")
-    print("node.attrib:%s" % node.attrib) 
-    print("node.attrib['libId']:%s" % node.attrib['libId'])
 
 def processJson(inputJsonFile):  
     fin = open(inputJsonFile, 'r')  
-#    fout = open(outputJsonFile, 'w')  
     for eachLine in fin:  
         line = eachLine.strip().decode('utf-8')                #去除每行首位可能的空格，并且转为Unicode进行处理  
         line = line.strip(',')                                 #去除Json文件每行大括号后的逗号  
         js = None  
         try:  
             js = json.loads(line)                              #加载Json文件  
-        except Exception,e:  
-            print 'bad line'  
+        except:  
+            print ('bad line')  
             continue
 #对未加载完的数据重新进行加载
         js["xxx"] = xxx                                        #对您需要修改的项进行修改，xxx表示你要修改的内容  
         outStr = json.dumps(js, ensure_ascii = False) + ','    #处理完之后重新转为Json格式，并在行尾加上一个逗号  
-#        fout.write(outStr.strip().encode('utf-8') + '\n')      #写回到一个新的Json文件中去  
     fin.close()                                                #关闭文件  
-#    fout.close()  
 
 def getSubMenu(docid,libid,toclib,topicid,hib,libv,KnlDocTreeNode) :  
     muneUrl =r'http://support.huawei.com/hedex/navi/navi.do?libId='+libid+'&libVersion='+libv+'&tocLib='+toclib+'&tocV='+libv+'&hib='+hib+'&topicId='+topicid
     print('获取子菜单',muneUrl)
+    logger.info('获取子菜单%s', muneUrl)
     muneContent = urllib.request.urlopen(muneUrl).read()   
     muneSoup = ElementTree.fromstring(muneContent)
     lst_node = muneSoup.getiterator("topic")
     for idx,node in enumerate(lst_node):  
-        changUrl = getTocUrl(docid,getHib(hib,idx),topicid,node.attrib['url'],libv,'','',node.attrib['txt'])
+#        logger.info('节点信息%s,%s,%s,%s,%s,%s,%s',docid,libid,toclib,topicid,hib,libv, json.dumps(node.attrib))
+        changUrl = getTocUrl(docid,getHib(hib,idx),libid,node.attrib['url'],libv,'','',node.attrib['txt'])
         docc = ModelDocContent(getUrlContent(changUrl),'5406')
         targetid = getTargetID(docc)
         if targetid !='':
@@ -134,18 +131,29 @@ def getSubMenu(docid,libid,toclib,topicid,hib,libv,KnlDocTreeNode) :
 def getUrlContent(cUrl):
     if cUrl.find("http://support.huawei.com") == -1:
         cUrl = 'http://support.huawei.com' + cUrl
+    logger.info('抓取网页路径%s', cUrl)
     cResContent = urllib.request.urlopen(cUrl).read()   
     cSoup = BeautifulSoup(cResContent,"html.parser")  
     strHtml= cSoup('body')
 #   删除评论区域信息
-    strHtml.find('iframe').extract()
+    delEl = cSoup.find_all('iframe')
+    for ifr in delEl:
+        ifr.extract()
 #   删除版本信息
-    strHtml.find('div',class_='hrcopyright').extract()
-    strHtml.find('div',class_='hwcopyright').extract()
+#    delEl = strHtml.find('div',class_='hrcopyright')
+#    for ifr in delEl:
+#        ifr.extract()
+#    delEl = strHtml.find('div',class_='hwcopyright')
+#    for ifr in delEl:
+#        ifr.extract()
 #   删除其余多余文档内容
-    strHtml.find(id="fbimgDiv").extract()
-    strHtml.find('script').extract()
-#   print('抓取网页长度%d'%len(strHtml)+'\r')
+#    delEl = strHtml.find(id="fbimgDiv")
+#    for ifr in delEl:
+#        ifr.extract()
+#    delEl = strHtml.find('script')
+#    for ifr in delEl:
+#        ifr.extract()
+    logger.info('抓取网页长度%d', len(strHtml))
     if len(strHtml)>0 :
        return strHtml[0].prettify()
     return ''
@@ -176,9 +184,11 @@ def crawlerUrl(docid):
     for liIter in lis : 
         print("********************************************************")
         print(liIter['id'],liIter['hib'],liIter['libid'],liIter['libv'])
+        logger.info('获取信息%s,%s,%s,%s', liIter['id'],liIter['hib'],liIter['libid'],liIter['libv'])
         aTag = liIter.findAll('a')
         for aIter in aTag :  
-            print(aIter.string,'http://support.huawei.com'+aIter['href'],)
+            print(aIter.string,'http://support.huawei.com'+aIter['href'])
+            logger.info('链接%s,%s', aIter.string,'http://support.huawei.com'+aIter['href'])
             docc = ModelDocContent(getUrlContent(aIter['href']),'5406')
             targetid = getTargetID(docc)
             if targetid !='':
@@ -193,10 +203,10 @@ def crawlerUrl(docid):
         print("抓取网页文档*********************************************",len(_DOC_CONTENT))
     insertData(KnlDoc,'doc')
     insertData(_DOC_CONTENT,'doccontent')
-    with open("tree.json", "w") as trf:
-         json.dumps(KnlDoc, trf)
-    with open("doc.json", "w") as docf:
-         json.dumps(_DOC_CONTENT, docf)
+    with open("../public/js/tree.json", "w") as trf:
+        trf.write(json.dumps(KnlDoc))
+    with open("../public/js/docs.json", "w") as docf:
+        docf.write(json.dumps(_DOC_CONTENT))
 
 def main():
     conn = MC('mongodb://localhost:27017/')
@@ -205,9 +215,27 @@ def main():
     for docid in _DOC_ID:
         crawlerUrl(docid)
     
-    
+def setup_logging(
+    default_path='logging.json', 
+    default_level=logging.INFO,
+    env_key='LOG_CFG'
+):
+    path = default_path
+    value = os.getenv(env_key, None)
+    if value:
+        path = value
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = json.load(f)
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+
+
+logger = logging.getLogger(__name__)
 if __name__ == '__main__':
-   main()
+    setup_logging()
+    main()
 
 
 #re = urllib2.Request(url)  

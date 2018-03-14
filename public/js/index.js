@@ -1,22 +1,31 @@
 "use strict";
 define(function(require, exports, module) {
-	var avh = (window.innerHeight) ? window.innerHeight : (document.documentElement && document.documentElement.clientHeight) ? document.documentElement.clientHeight : document.body.offsetHeight;
-	avh = avh - 64 - 43;
-	var Component = Vue.extend(getVueConfig());
-	var pVue = new Component().$mount('.app');
-	//pVue.proModel = pVue.proModels[parseInt(Math.random() * pVue.proModels.length) - 1];
-	var um = UM.getEditor('editor', {
-		//imageUrl: serverPath + "imageUp.php",
-		//imagePath: serverPath,
-		lang: /^zh/.test(navigator.language || navigator.browserLanguage || navigator.userLanguage) ? 'zh-cn' : 'en',
-		langPath: UMEDITOR_CONFIG.UMEDITOR_HOME_URL + "lang/",
-		autoHeightEnabled: true,
-		initialFrameHeight: 240
-	});
-	//vue加载完成后关闭提示窗口
-	pVue.$nextTick(function() {
-		$('.ivu-spin').hide();
-	});
+	var avh, pVue, opt, itemDoc, proList;
+	exports.init = function(opts) {
+		opt = opts;
+		avh = (window.innerHeight) ? window.innerHeight : (document.documentElement && document.documentElement.clientHeight) ? document.documentElement.clientHeight : document.body.offsetHeight;
+		avh = avh - 64 - 43;
+		getAjaxProListData();
+		getAjaxDocsTreeData(initVueObject);
+	}
+
+	function initVueObject() {
+		var Component = Vue.extend(getVueConfig());
+		pVue = new Component().$mount('.app');
+		//pVue.proModel = pVue.proModels[parseInt(Math.random() * pVue.proModels.length) - 1];
+		var um = UM.getEditor('editor', {
+			//imageUrl: serverPath + "imageUp.php",
+			//imagePath: serverPath,
+			lang: /^zh/.test(navigator.language || navigator.browserLanguage || navigator.userLanguage) ? 'zh-cn' : 'en',
+			langPath: UMEDITOR_CONFIG.UMEDITOR_HOME_URL + "lang/",
+			autoHeightEnabled: true,
+			initialFrameHeight: 240
+		});
+		//vue加载完成后关闭提示窗口
+		pVue.$nextTick(function() {
+			$('.ivu-spin').hide();
+		});
+	}
 	/**
 	 * 获取初始化界面配置参数
 	 */
@@ -38,13 +47,7 @@ define(function(require, exports, module) {
 					addNewTreeNodeTitle: false, //增加节点窗口控制显示
 					addParentNode: null, //添加节点原父节点
 					delParentNode: null, //删除节点参数信息
-					item: { //添加编辑对象
-						ispublish: false, //编辑是否发布
-						title: '', //编辑标题
-						proModel: '',
-						tree: DocTree.navtree, //导航树
-						content: doc //内容
-					},
+					item: itemDoc,
 					//查询部分
 					keyword: '',
 					proModel: 'CE12812',
@@ -119,7 +122,6 @@ define(function(require, exports, module) {
 					qtypes: ['单选题', '多选题', '判断题', '简答题'], //题型
 					qkeywords: '', //题库管理关键字
 					questionList: getQuestionBank(), //题库资料
-					questionDoc: getQuestionDoc(), //试卷列表
 					meExaminationStartDate: '', //考试开始时间
 					meExaminationEndDate: '', //考试结束时间
 					meExaminationList: getMeExaminationList(), //我的试卷列表
@@ -188,6 +190,9 @@ define(function(require, exports, module) {
 						var bdc = this.breadcrumb.splice(0, 1);
 						this.breadcrumb = bdc.concat(str);
 					}
+					console.log('节点点击', node);
+					getAjaxDocData(node[0].targetid);
+					//加载对应的文档数据getAjaxDocData
 				},
 				//获取文档节点选中后节点列表标题数组
 				getSelectedNodeParentNodesStr: function(nodes) {
@@ -335,7 +340,6 @@ define(function(require, exports, module) {
 	function getDocListTestData() {
 		var len = Math.random() * 30,
 			arr = [],
-			proList = getProList(),
 			plen = proList.length;
 		for(var i = 0; i < len; i++) {
 			arr.push({
@@ -352,8 +356,7 @@ define(function(require, exports, module) {
 	 * 获取产品型号列表
 	 */
 	function getProModelsTestData() {
-		var proList = getProList(),
-			len = proList.length,
+		var len = proList.length,
 			arr = [];
 		for(var i = 0; i < len; i++) {
 			proList[i].family == '交换机' ? arr.push(proList[i].type) : '';
@@ -368,7 +371,7 @@ define(function(require, exports, module) {
 			"_id": Mock.mock('@string(32)'),
 			"title": "湖北省公司",
 			"unitid": Mock.mock('@string(32)'),
-			"expand":true,
+			"expand": true,
 			"children": [{
 					"_id": Mock.mock('@string(32)'),
 					"title": "武汉市分公司",
@@ -392,7 +395,7 @@ define(function(require, exports, module) {
 			"_id": Mock.mock('@string(32)'),
 			"title": "北京公司",
 			"unitid": Mock.mock('@string(32)'),
-			"expand":true,
+			"expand": true,
 			"children": [{
 					"_id": Mock.mock('@string(32)'),
 					"title": "朝阳区分公司",
@@ -498,95 +501,7 @@ define(function(require, exports, module) {
 		}
 		return [qas, qa];
 	}
-	/**
-	 * 获取试卷列表
-	 */
-	function getQuestionDoc() {
-		var len = Mock.mock('@integer(2, 50)'),
-			qds = [],
-			qdl = [];
-		for(var i = 0; i < len; i++) {
-			qdl = getQuestionDocList();
-			qds.push({
-				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(10, 30)'),
-				"question": qdl,
-				"questiontext": analyQuestionDoc(qdl),
-				"examtime": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"delay": '0',
-				"duration": Mock.mock('@integer(30,120)'),
-				"user_id": '',
-				"status": ['未考试', '考试中', '考试结束', '作废'][Mock.mock('@integer(0,3)')],
-				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
-				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
-			});
-		}
-		return qds;
-	}
-	/**
-	 * 获取试题题目列表
-	 */
-	function getQuestionDocList() {
-		var type = Mock.mock('@integer(0,3)'),
-			qdl = [];
-		for(var i = 0, l = 15; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(1,2)'),
-				"type": 2
-			});
-		}
-		for(var i = 0, l = 20; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(1,2)'),
-				"type": 0
-			});
-		}
-		for(var i = 0, l = 10; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(2,5)'),
-				"type": 1
-			});
-		}
-		for(var i = 0, l = 5; i < l; i++) {
-			qdl.push({
-				"questionid": Mock.mock('@string(32)'),
-				"fraction": Mock.mock('@integer(5,15)'),
-				"type": 3
-			});
-		}
-		return qdl;
-	}
-	/**
-	 * 分析试卷题目
-	 */
-	function analyQuestionDoc(qdl) {
-		var anqdl = {
-			0: {
-				cnt: 0,
-				fraction: 0
-			},
-			1: {
-				cnt: 0,
-				fraction: 0
-			},
-			2: {
-				cnt: 0,
-				fraction: 0
-			},
-			3: {
-				cnt: 0,
-				fraction: 0
-			}
-		};
-		for(var i = 0, l = qdl.length; i < l; i++) {
-			anqdl[qdl[i]['type']]['fraction'] += qdl[i]['fraction'];
-			anqdl[qdl[i]['type']]['cnt']++;
-		}
-		return anqdl;
-	}
+	
 	/**
 	 * 获取我的试卷列表
 	 */
@@ -609,913 +524,62 @@ define(function(require, exports, module) {
 		}
 		return examinaList;
 	}
-
-	function getProList() {
-		return [{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS1500",
-				"type": "AntiDDoS1500-D"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS1500",
-				"type": "AntiDDoS1550"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS1500",
-				"type": "AntiDDoS1520"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS1600",
-				"type": "AntiDDoS1650"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS1600",
-				"type": "AntiDDoS1680"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS8000",
-				"type": "AntiDDoS8030"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS8000",
-				"type": "AntiDDoS8080"
-			},
-			{
-				"family": "AntiDDoS",
-				"name": "AntiDDoS8000",
-				"type": "AntiDDoS8160"
-			},
-			{
-				"family": "FireHunter",
-				"name": "FireHunter 6000",
-				"type": "FireHunter6000"
-			},
-			{
-				"family": "IVS",
-				"name": "VCN500",
-				"type": "VCN500"
-			},
-			{
-				"family": "IVS",
-				"name": "eSpace VCN3000",
-				"type": "eSpace VCN3000"
-			},
-			{
-				"family": "LogCenter",
-				"name": "LogCenter",
-				"type": "LogCenter"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5612(H831CCFE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5612(H832CCFE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5612(H835CCFE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5616(CCUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5616(CCUC)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5616(CCUD)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA561x",
-				"type": "MA5616(CCUE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5620(H821EPUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5620(H822EPUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5620(H825EPUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5621(4FE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5621(4GE/FE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5623A"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5626(H821EPUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5626(H822EPUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA562x",
-				"type": "MA5626(H825EPUB)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA563x",
-				"type": "MA5633(第一代)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA563x",
-				"type": "MA5633(第二代)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA582x",
-				"type": "MA5821(24GE,POE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA582x",
-				"type": "MA5821(FE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA582x",
-				"type": "MA5821(GE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA582x",
-				"type": "MA5822(FE)"
-			},
-			{
-				"family": "MDU",
-				"name": "MA582x",
-				"type": "MA5822(GE)"
-			},
-			{
-				"family": "OLT",
-				"name": "MA5600T系列",
-				"type": "MA5680T/MA5683T/MA5608T"
-			},
-			{
-				"family": "OLT",
-				"name": "MA5800系列",
-				"type": "MA5800"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12800"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12804"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12804S"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12808"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12808S"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12812"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 12800",
-				"type": "CE12816"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 5800",
-				"type": "CE5810EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 5800",
-				"type": "CE5850EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 5800",
-				"type": "CE5850HI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 5800",
-				"type": "CE5855EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6810EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6810LI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6850EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6850HI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6850U-HI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6851HI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6855HI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 6800",
-				"type": "CE6870EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 7800",
-				"type": "CE7850EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 7800",
-				"type": "CE7855EI"
-			},
-			{
-				"family": "交换机",
-				"name": "CloudEngine 8800",
-				"type": "CE8860EI"
-			},
-			{
-				"family": "交换机",
-				"name": "E600 Switch",
-				"type": "E600"
-			},
-			{
-				"family": "交换机",
-				"name": "S12700",
-				"type": "S12704"
-			},
-			{
-				"family": "交换机",
-				"name": "S12700",
-				"type": "S12708"
-			},
-			{
-				"family": "交换机",
-				"name": "S12700",
-				"type": "S12710"
-			},
-			{
-				"family": "交换机",
-				"name": "S12700",
-				"type": "S12712"
-			},
-			{
-				"family": "交换机",
-				"name": "S2700",
-				"type": "S2700EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S2700",
-				"type": "S2700SI"
-			},
-			{
-				"family": "交换机",
-				"name": "S2700",
-				"type": "S2710SI"
-			},
-			{
-				"family": "交换机",
-				"name": "S2700",
-				"type": "S2720EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S2700",
-				"type": "S2750EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S3700",
-				"type": "S3700EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S3700",
-				"type": "S3700HI"
-			},
-			{
-				"family": "交换机",
-				"name": "S3700",
-				"type": "S3700SI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5700EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5700HI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5700LI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5700S-LI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5700SI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5710-C-LI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5710-X-LI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5710EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5710HI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5720-LI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5720EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5720HI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5720S-LI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5720S-SI"
-			},
-			{
-				"family": "交换机",
-				"name": "S5700",
-				"type": "S5720SI"
-			},
-			{
-				"family": "交换机",
-				"name": "S600-E",
-				"type": "S600-E"
-			},
-			{
-				"family": "交换机",
-				"name": "S6700",
-				"type": "S6700EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S6700",
-				"type": "S6720EI"
-			},
-			{
-				"family": "交换机",
-				"name": "S7700",
-				"type": "S7703"
-			},
-			{
-				"family": "交换机",
-				"name": "S7700",
-				"type": "S7706"
-			},
-			{
-				"family": "交换机",
-				"name": "S7700",
-				"type": "S7710"
-			},
-			{
-				"family": "交换机",
-				"name": "S7700",
-				"type": "S7712"
-			},
-			{
-				"family": "交换机",
-				"name": "S9300",
-				"type": "S9303"
-			},
-			{
-				"family": "交换机",
-				"name": "S9300",
-				"type": "S9306"
-			},
-			{
-				"family": "交换机",
-				"name": "S9300",
-				"type": "S9312"
-			},
-			{
-				"family": "交换机",
-				"name": "S9700",
-				"type": "S9703"
-			},
-			{
-				"family": "交换机",
-				"name": "S9700",
-				"type": "S9706"
-			},
-			{
-				"family": "交换机",
-				"name": "S9700",
-				"type": "S9712"
-			},
-			{
-				"family": "交换机",
-				"name": "SPU",
-				"type": "SPU"
-			},
-			{
-				"family": "防火墙",
-				"name": "ASG2050",
-				"type": "ASG2050"
-			},
-			{
-				"family": "防火墙",
-				"name": "ASG2100",
-				"type": "ASG2100"
-			},
-			{
-				"family": "防火墙",
-				"name": "ASG2150",
-				"type": "ASG2150"
-			},
-			{
-				"family": "防火墙",
-				"name": "ASG2200",
-				"type": "ASG2200"
-			},
-			{
-				"family": "防火墙",
-				"name": "ASG2600",
-				"type": "ASG2600"
-			},
-			{
-				"family": "防火墙",
-				"name": "ASG2800",
-				"type": "ASG2800"
-			},
-			{
-				"family": "防火墙",
-				"name": "NGFW Module",
-				"type": "NGFW-Module"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2050",
-				"type": "NIP2050"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2050D",
-				"type": "NIP2050D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2100",
-				"type": "NIP2100"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2100D",
-				"type": "NIP2100D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2130",
-				"type": "NIP2130"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2130D",
-				"type": "NIP2130D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2150",
-				"type": "NIP2150"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2150D",
-				"type": "NIP2150D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2200",
-				"type": "NIP2200"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP2200D",
-				"type": "NIP2200D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5000I",
-				"type": "NIP5000I"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5100",
-				"type": "NIP5100"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5100D",
-				"type": "NIP5100D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5200",
-				"type": "NIP5200"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5200D",
-				"type": "NIP5200D"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5500",
-				"type": "NIP5500"
-			},
-			{
-				"family": "防火墙",
-				"name": "NIP5500D",
-				"type": "NIP5500D"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN2230",
-				"type": "SVN2230"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN2260",
-				"type": "SVN2260"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5530",
-				"type": "SVN5530"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5530-C1",
-				"type": "SVN5530-C1"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5530-C3",
-				"type": "SVN5530-C3"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5560",
-				"type": "SVN5560"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5600",
-				"type": "SVN5630"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5600",
-				"type": "SVN5660"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5800",
-				"type": "SVN5830"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5800",
-				"type": "SVN5850"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5800",
-				"type": "SVN5860"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5800",
-				"type": "SVN5880"
-			},
-			{
-				"family": "防火墙",
-				"name": "SVN5800-C",
-				"type": "SVN5880-C"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2100"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2110-A-GW-C"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2110-A-GW-W"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2110-A-W"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2110-F"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2110-F-W"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2120BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2130BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2130HSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2160BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2100",
-				"type": "USG2160HSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2200",
-				"type": "USG2200"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2200",
-				"type": "USG2205BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2200",
-				"type": "USG2205HSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2200",
-				"type": "USG2220BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG2200",
-				"type": "USG2220HSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG5100",
-				"type": "USG5100"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG5100",
-				"type": "USG5120BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG5100",
-				"type": "USG5120HSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG5100",
-				"type": "USG5150BSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG5100",
-				"type": "USG5150HSR"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG5500",
-				"type": "USG5500"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6306"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6308"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6310"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6320"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6330"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6350"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6360"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6370"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6380"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6300",
-				"type": "USG6390"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6500",
-				"type": "USG6507"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6500",
-				"type": "USG6510-SJJ"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6500",
-				"type": "USG6530"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6500",
-				"type": "USG6550"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6500",
-				"type": "USG6570"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6600",
-				"type": "USG6620"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6600",
-				"type": "USG6630"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6600",
-				"type": "USG6650"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6600",
-				"type": "USG6660"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6600",
-				"type": "USG6670"
-			},
-			{
-				"family": "防火墙",
-				"name": "USG6600",
-				"type": "USG6680"
+	/**
+	 * 获取异步数据接口
+	 */
+	function getAjaxDocsTreeData(callback) {
+		opt.model._ajaxGetDataInterFace({
+			inter: '../js/tree.json'
+		}, function(result) {
+			//console.log('返回结果',result);
+			if(result) {
+				itemDoc = { //添加编辑对象
+					ispublish: false, //编辑是否发布
+					title: result.pro, //编辑标题
+					proModel: result.pro,
+					tree: result.navtree, //导航树
+					content: {} //内容
+				}
 			}
-		];
+			callback && callback.call();
+		});
+	}
+	/**
+	 * 获取异步数据接口
+	 */
+	function getAjaxDocData(tarid) {
+		if(itemDoc['docs'] && itemDoc['docs'].length > 0) {
+			var docs = itemDoc['docs'].filter(function(el) {
+				return el._id = tarid;
+			});
+			docs && docs.length > 0 ? pVue.item.content = docs[0] : pVue.item.content = null;
+		} else {
+			opt.model._ajaxGetDataInterFace({
+				inter: '../js/docs.json'
+			}, function(result) {
+				console.log('返回结果', result);
+				if(result) {
+					itemDoc['docs'] = result;
+				}
+				var docs = itemDoc['docs'].filter(function(el) {
+					return el._id = tarid;
+				});
+				docs && docs.length > 0 ? pVue.item.content = docs[0] : pVue.item.content = null;
+			});
+		}
+	}
+	/**
+	 * 异步获取产品型号列表
+	 */
+	function getAjaxProListData(callback) {
+		opt.model._ajaxGetDataInterFace({
+			inter: '../js/pro.json'
+		}, function(result) {
+			//console.log('返回结果',result);
+			if(result) {
+				proList = result;
+			}
+			callback && callback.call();
+		});
 	}
 });
