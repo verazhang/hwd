@@ -20,7 +20,21 @@ Route::get('product','ProductController@index');
 Route::get('product/add','ProductController@add');
 Route::get('product/remove/{code}','ProductController@remove');
 
+//知识查询、维护
 Route::get('document/get/{docid}', 'DocumentController@get');
 Route::get('document/content/{contentid}', 'DocumentController@getContent');
 Route::get('document/type', 'DocumentController@getTypeList');
 Route::get('document/search', 'DocumentController@search');
+
+//题库管理
+Route::post('examcontent/add', 'ExamController@addContent');
+Route::post('examcontent/edit/{contentid}', 'ExamController@editContent');
+Route::post('examcontent/delete/{contentid}', 'ExamController@deleteContent');
+Route::get('examcontent/get', 'ExamController@getContent');
+//试卷管理
+Route::post('exam/add', 'ExamController@add');
+Route::post('exam/edit/{examid}', 'ExamController@edit');
+Route::post('exam/delete/{examid}', 'ExamController@delete');
+Route::get('exam/get', 'ExamController@get');
+//我的考试
+Route::get('examresult/get/{user_id?}', 'ExamController@getResult');

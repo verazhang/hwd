@@ -11,4 +11,20 @@ use Illuminate\Foundation\Auth\Access\AuthorizesResources;
 class Controller extends BaseController
 {
     use AuthorizesRequests, AuthorizesResources, DispatchesJobs, ValidatesRequests;
+
+    const STATUS_SUCCESS = 1;
+    const STATUS_FAIL = 0;
+    /**
+     * result serialize
+     * @param int $success sucess or fail
+     * @param string $data
+     * @param string $message fail message or explain
+     * @param array $extra
+     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function resultJson($success = 1, $data = '', $message = '', $extra = [])
+    {
+        $source = ['success' => $success, 'msg' => $message, 'data' => $data];
+        return response()->json(array_merge($source, $extra));
+    }
 }

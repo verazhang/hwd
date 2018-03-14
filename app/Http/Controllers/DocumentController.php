@@ -1,6 +1,6 @@
 <?php
 /**
- * document manaer
+ * document manager
  */
 
 namespace App\Http\Controllers;
