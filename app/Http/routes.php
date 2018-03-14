@@ -20,6 +20,9 @@ Route::get('/doc/{docid}', function () {
 Route::get('/examlist/{type}', function () {
     return view('examlist');
 });
+Route::get('/exam/{examid}', function () {
+    return view('showexam');
+});
 Route::get('mongo','MongoController@index');
 Route::get('test','ProductController@test');
 Route::get('product','ProductController@index');

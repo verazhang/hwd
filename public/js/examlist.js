@@ -33,7 +33,9 @@ define(function(require, exports, module) {
 						},
 						{
 							title: '试卷名称',
-							key: 'title'
+							key: 'title',
+							ellipsis: true,
+							width: 320
 						},
 						{
 							title: '总分',
@@ -45,12 +47,6 @@ define(function(require, exports, module) {
 							title: '时限',
 							key: 'duration'
 						}, {
-							title: '查阅',
-							key: 'viewcnt'
-						}, {
-							title: '测试',
-							key: 'testcnt'
-						}, {
 							title: '出卷时间',
 							key: 'create_at'
 						}, {
@@ -59,15 +55,25 @@ define(function(require, exports, module) {
 						}, {
 							title: '操作',
 							key: 'action',
-							width: 150,
+							width: 200,
 							align: 'center',
 							render: (h, params) => {
 								return h('div', [
-									h('Button', {
-										props: {
-											type: 'primary',
-											size: 'small'
+									h('a', {
+										props:{
+											did:params['row']['_id']
 										},
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												console.log(arguments,'预览操作');
+												window.open('../exam/'+Mock.mock('@natural()'))
+											}
+										}
+									}, '预览'),
+									h('a', {
 										style: {
 											marginRight: '5px'
 										},
@@ -79,11 +85,9 @@ define(function(require, exports, module) {
 												});
 											}
 										}
-									}, '查看'),
-									h('Button', {
-										props: {
-											type: 'error',
-											size: 'small'
+									}, '修改'), h('a', {
+										style: {
+											marginRight: '5px'
 										},
 										on: {
 											click: () => {
@@ -93,7 +97,19 @@ define(function(require, exports, module) {
 												});
 											}
 										}
-									}, '测试')
+									}, '删除'), h('a', {
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												this.$Modal.info({
+													title: "提示信息",
+													content: "功能完善中"
+												});
+											}
+										}
+									}, '编辑考题')
 								]);
 							}
 						}
@@ -119,18 +135,18 @@ define(function(require, exports, module) {
 	 * 获取试卷列表
 	 */
 	function getQuestionDoc() {
-		var len = Mock.mock('@integer(2, 50)'),
+		var len = 2,
 			qds = [],
 			qdl = [];
 		for(var i = 0; i < len; i++) {
 			qdl = getQuestionDocList();
 			qds.push({
 				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(10, 30)'),
+				"title": i == 0 ? '传输设备（多选题）' : '传输设备（单选题）',
 				"question": qdl,
 				"questiontext": analyQuestionDoc(qdl),
 				"serialnum": Mock.mock({
-					'regexp|3': /\d{2,5}/
+					'regexp': /\d{6}/
 				}).regexp,
 				"examtime": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
 				"fraction": Mock.mock('@integer(70,150)'),

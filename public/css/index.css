@@ -232,3 +232,13 @@ body.noscroll {
 .ivu-tree {
 	overflow: auto;
 }
+.model-question .ivu-row{
+	height: 48px;
+	line-height: 48px;
+}
+.model-question  .ivu-row .ivu-col >a{
+	margin-right: 22px;
+}
+.exam-list-content{
+	overflow: auto;
+}

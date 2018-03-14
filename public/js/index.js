@@ -47,6 +47,7 @@ define(function(require, exports, module) {
 					addNewTreeNodeTitle: false, //增加节点窗口控制显示
 					addParentNode: null, //添加节点原父节点
 					delParentNode: null, //删除节点参数信息
+					docSpinShow: false, //文档加载提示信息
 					item: itemDoc,
 					//查询部分
 					keyword: '',
@@ -129,6 +130,81 @@ define(function(require, exports, module) {
 					examinaStatusList: ['未开始', '考试中', '已结束'], //考试状态列表
 					examinakeywords: '', //考试管理关键词
 					examinaList: getMeExaminationList(), //考试管理试卷
+					examCollapseValue: ['1', '2', '3'], //试卷管理展示
+					examList: getQuestionDoc(), //试卷列表					
+					examCols: [{
+							title: '试卷编号',
+							key: 'serialnum'
+						},
+						{
+							title: '试卷名称',
+							key: 'title',
+							ellipsis: true,
+							width: 320
+						},
+						{
+							title: '总分',
+							key: 'fraction'
+						}, {
+							title: '题数',
+							key: 'update_at'
+						}, {
+							title: '时限',
+							key: 'duration'
+						}, {
+							title: '查阅',
+							key: 'viewcnt'
+						}, {
+							title: '测试',
+							key: 'testcnt'
+						}, {
+							title: '出卷时间',
+							key: 'create_at'
+						}, {
+							title: '录入者',
+							key: 'user_name'
+						}, {
+							title: '操作',
+							key: 'action',
+							width: 150,
+							align: 'center',
+							render: (h, params) => {
+								return h('div', [
+									h('Button', {
+										props: {
+											type: 'primary',
+											size: 'small'
+										},
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												this.$Modal.info({
+													title: "提示信息",
+													content: "功能完善中"
+												});
+											}
+										}
+									}, '查看'),
+									h('Button', {
+										props: {
+											type: 'error',
+											size: 'small'
+										},
+										on: {
+											click: () => {
+												this.$Modal.info({
+													title: "提示信息",
+													content: "功能完善中"
+												});
+											}
+										}
+									}, '测试')
+								]);
+							}
+						}
+					],
 				}
 			},
 			methods: {
@@ -190,8 +266,9 @@ define(function(require, exports, module) {
 						var bdc = this.breadcrumb.splice(0, 1);
 						this.breadcrumb = bdc.concat(str);
 					}
+					this.docSpinShow = true;
 					console.log('节点点击', node);
-					getAjaxDocData(node[0].targetid);
+					node && node[0] && node[0].targetid && getAjaxDocData(node[0].targetid);
 					//加载对应的文档数据getAjaxDocData
 				},
 				//获取文档节点选中后节点列表标题数组
@@ -501,7 +578,7 @@ define(function(require, exports, module) {
 		}
 		return [qas, qa];
 	}
-	
+
 	/**
 	 * 获取我的试卷列表
 	 */
@@ -550,9 +627,12 @@ define(function(require, exports, module) {
 	function getAjaxDocData(tarid) {
 		if(itemDoc['docs'] && itemDoc['docs'].length > 0) {
 			var docs = itemDoc['docs'].filter(function(el) {
-				return el._id = tarid;
+				return el._id == tarid;
 			});
 			docs && docs.length > 0 ? pVue.item.content = docs[0] : pVue.item.content = null;
+			pVue.$nextTick(function() {
+				pVue.docSpinShow = false;
+			});
 		} else {
 			opt.model._ajaxGetDataInterFace({
 				inter: '../js/docs.json'
@@ -562,9 +642,12 @@ define(function(require, exports, module) {
 					itemDoc['docs'] = result;
 				}
 				var docs = itemDoc['docs'].filter(function(el) {
-					return el._id = tarid;
+					return el._id == tarid;
 				});
 				docs && docs.length > 0 ? pVue.item.content = docs[0] : pVue.item.content = null;
+				pVue.$nextTick(function() {
+					pVue.docSpinShow = false;
+				});
 			});
 		}
 	}
@@ -581,5 +664,101 @@ define(function(require, exports, module) {
 			}
 			callback && callback.call();
 		});
+	}
+	/**
+	 * 获取试卷列表
+	 */
+	function getQuestionDoc() {
+		var len = Mock.mock('@integer(2, 20)'),
+			qds = [],
+			qdl = [];
+		for(var i = 0; i < len; i++) {
+			qdl = getQuestionDocList();
+			qds.push({
+				"_id": Mock.mock('@string(32)'),
+				"title": Mock.mock('@ctitle(10, 30)'),
+				"question": qdl,
+				"questiontext": analyQuestionDoc(qdl),
+				"serialnum": Mock.mock({
+					'regexp|3': /\d{2,5}/
+				}).regexp,
+				"examtime": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"fraction": Mock.mock('@integer(70,150)'),
+				"testcnt": Mock.mock('@integer(1,10000)'),
+				"viewcnt": Mock.mock('@integer(1,10000)'),
+				"delay": '0',
+				"duration": Mock.mock('@integer(30,120)'),
+				"user_id": '',
+				"user_name": Mock.mock('@cname'),
+				"status": ['未考试', '考试中', '考试结束', '作废'][Mock.mock('@integer(0,3)')],
+				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
+				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
+			});
+		}
+		return qds;
+	}
+	/**
+	 * 获取试题题目列表
+	 */
+	function getQuestionDocList() {
+		var type = Mock.mock('@integer(0,3)'),
+			qdl = [];
+		for(var i = 0, l = 15; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(1,2)'),
+				"type": 2
+			});
+		}
+		for(var i = 0, l = 20; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(1,2)'),
+				"type": 0
+			});
+		}
+		for(var i = 0, l = 10; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(2,5)'),
+				"type": 1
+			});
+		}
+		for(var i = 0, l = 5; i < l; i++) {
+			qdl.push({
+				"questionid": Mock.mock('@string(32)'),
+				"fraction": Mock.mock('@integer(5,15)'),
+				"type": 3
+			});
+		}
+		return qdl;
+	}
+	/**
+	 * 分析试卷题目
+	 */
+	function analyQuestionDoc(qdl) {
+		var anqdl = {
+			0: {
+				cnt: 0,
+				fraction: 0
+			},
+			1: {
+				cnt: 0,
+				fraction: 0
+			},
+			2: {
+				cnt: 0,
+				fraction: 0
+			},
+			3: {
+				cnt: 0,
+				fraction: 0
+			}
+		};
+		for(var i = 0, l = qdl.length; i < l; i++) {
+			anqdl[qdl[i]['type']]['fraction'] += qdl[i]['fraction'];
+			anqdl[qdl[i]['type']]['cnt']++;
+		}
+		return anqdl;
 	}
 });

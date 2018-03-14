@@ -24,7 +24,7 @@
 							张三
 						</breadcrumb-item>
 						<breadcrumb-item to="/components/breadcrumb">
-							<icon type="pound"></icon>
+							<icon type="log-out"></icon>
 							退出
 						</breadcrumb-item>
 					</breadcrumb>
@@ -32,9 +32,17 @@
 			</i-menu>
 		</i-header>
 		<layout :style="{height:layoutContentHeight+'px'}">
-			<i-content>
-				@include('layouts.templates.question.exam-list')
-			</i-content>
+			<row style="margin-top: 22px;margin-bottom: 22px;">
+				<i-col span="18">
+					<h4> 华为认证网络工程师试卷 </h4>
+				</i-col>
+				<i-col span="6" style="text-align: right;">
+					<i-button>
+						新增
+					</i-button>
+				</i-col>
+			</row>
+			@include('layouts.templates.question.exam-list')
 		</layout>
 		<i-footer class="layout-footer-center">
 			2018 &copy; {{env('SYSTEM_NAME')}}

@@ -58,12 +58,12 @@
 					@include('layouts.templates.question.exam-nav')
 				</section>
 				<section v-else-if="menuID=='2-3'" class="model-examination">
-					@include('layouts.templates.question.examination-search')
-					@include('layouts.templates.question.examination')
+					@include('layouts.templates.question.exam-list')
+					<Page :total="100" show-sizer></Page>
 				</section>
 				<section v-else-if="menuID=='2-4'" class="model-me">
-					@include('layouts.templates.question.me-examination-search')
-					@include('layouts.templates.question.me-examination-list')
+					@include('layouts.templates.question.exam-list')
+					<Page :total="100" show-sizer></Page>
 				</section>
 			</i-content>
 			<i-content v-else-if="activeMenu=='3'">

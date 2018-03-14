@@ -24,7 +24,7 @@
 							张三
 						</breadcrumb-item>
 						<breadcrumb-item to="/components/breadcrumb">
-							<icon type="pound"></icon>
+							<icon type="log-out"></icon>
 							退出
 						</breadcrumb-item>
 					</breadcrumb>
@@ -49,12 +49,14 @@
 @endsection
 @section('script')
 <script src="../js/seajs/sea.js"></script>
+<script src="../js/jquery.min.js"></script>
 <script src="../js/vue/vue.min.js"></script>
 <script src="../js/vue/iview.min.js"></script>
 <script src="../js/mock/mock-min.js"></script>
-<script src="../js/tree.js"></script>
-<script src="../js/docs.js"></script>
-<script>
-seajs.use('../js/show.js', function(model) {});
-</script>
+<script>seajs.use(['../js/show.js', '../js/lib/com.js'], function() {
+	var args = arguments;
+	args[0].init({
+		model: args[1]
+	});
+});</script>
 @endsection

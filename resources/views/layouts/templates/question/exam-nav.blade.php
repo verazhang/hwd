@@ -1,6 +1,6 @@
 <template>
-	<i-collapse accordion>
-		<i-panel name="1">
+	<collapse v-model="examCollapseValue">
+		<panel name="1">
 			传输(1级)
 			<div slot="content">
 				<row>
@@ -24,13 +24,13 @@
 						思科
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
@@ -40,20 +40,20 @@
 						中兴
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
 				</row>
 			</div>
-		</i-panel>
-		<i-panel name="2">
+		</panel>
+		<panel name="2">
 			网络
 			<div slot="content">
 				<row>
@@ -61,13 +61,13 @@
 						华为
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
@@ -77,13 +77,13 @@
 						思科
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
@@ -93,20 +93,20 @@
 						中兴
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
 				</row>
 			</div>
-		</i-panel>
-		<i-panel name="3">
+		</panel>
+		<panel name="3">
 			交换
 			<div slot="content">
 				<row>
@@ -114,13 +114,13 @@
 						华为
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
@@ -130,13 +130,13 @@
 						思科
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
@@ -146,18 +146,18 @@
 						中兴
 					</i-col>
 					<i-col span="22">
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							高级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							中级运维
 						</a>
-						<a>
+						<a href="examlist/2-21" target="_blank">
 							初级运维
 						</a>
 					</i-col>
 				</row>
 			</div>
-		</i-panel>
-	</i-collapse>
+		</panel>
+	</collapse>
 </template>
