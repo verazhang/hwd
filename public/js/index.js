@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 		avh = avh - 64 - 43;
 		getAjaxProListData();
 		getAjaxDocsTreeData(initVueObject);
+		getAjaxDocData();
 	}
 
 	function initVueObject() {
