@@ -606,7 +606,7 @@ define(function(require, exports, module) {
 	 */
 	function getAjaxDocsTreeData(callback) {
 		opt.model._ajaxGetDataInterFace({
-			inter: '../js/tree.json'
+			inter: '../data/tree.json'
 		}, function(result) {
 			//console.log('返回结果',result);
 			if(result) {
@@ -635,7 +635,7 @@ define(function(require, exports, module) {
 			});
 		} else {
 			opt.model._ajaxGetDataInterFace({
-				inter: '../js/docs.json'
+				inter: '../data/docs.json'
 			}, function(result) {
 				console.log('返回结果', result);
 				if(result) {
@@ -656,7 +656,7 @@ define(function(require, exports, module) {
 	 */
 	function getAjaxProListData(callback) {
 		opt.model._ajaxGetDataInterFace({
-			inter: '../js/pro.json'
+			inter: '../data/pro.json'
 		}, function(result) {
 			//console.log('返回结果',result);
 			if(result) {
