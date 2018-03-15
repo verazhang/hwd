@@ -412,9 +412,7 @@ define(function(require, exports, module) {
 						this.breadcrumb = bdc.concat(str);
 					}
 					this.docSpinShow = true;
-					console.log('节点点击', node);
 					node && node[0] && node[0].targetid && getAjaxDocData(node[0].targetid);
-					//加载对应的文档数据getAjaxDocData
 				},
 				//获取文档节点选中后节点列表标题数组
 				getSelectedNodeParentNodesStr: function(nodes) {
@@ -767,7 +765,7 @@ define(function(require, exports, module) {
 	function getAjaxDocsTreeData(callback) {
 		opt.model._ajaxGetDataInterFace({
 			inter: 'data/tree.json',
-			method:'GET'
+			method: 'GET'
 		}, function(result) {
 			//console.log('返回结果',result);
 			if(result) {
@@ -786,7 +784,7 @@ define(function(require, exports, module) {
 	 * 获取异步数据接口
 	 */
 	function getAjaxDocData(tarid) {
-		if(itemDoc['docs'] && itemDoc['docs'].length > 0) {
+		if(itemDoc && itemDoc['docs'] && itemDoc['docs'].length > 0) {
 			var docs = itemDoc['docs'].filter(function(el) {
 				return el._id == tarid;
 			});
@@ -797,9 +795,8 @@ define(function(require, exports, module) {
 		} else {
 			opt.model._ajaxGetDataInterFace({
 				inter: 'data/docs.json',
-			method:'GET'
+				method: 'GET'
 			}, function(result) {
-				console.log('返回结果', result);
 				if(result) {
 					itemDoc['docs'] = result;
 				}
@@ -819,7 +816,7 @@ define(function(require, exports, module) {
 	function getAjaxProListData(callback) {
 		opt.model._ajaxGetDataInterFace({
 			inter: 'data/pro.json',
-			method:'GET'
+			method: 'GET'
 		}, function(result) {
 			//console.log('返回结果',result);
 			if(result) {
@@ -858,7 +855,7 @@ define(function(require, exports, module) {
 				"user_name": Mock.mock('@cname'),
 				"status": ['未考试', '考试中', '考试结束', '作废'][k],
 				"cellClassName": {
-					status: 'exam-list-row-' + ['begun','working','finish','cancellation'][k]
+					status: 'exam-list-row-' + ['begun', 'working', 'finish', 'cancellation'][k]
 				},
 				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
 				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
