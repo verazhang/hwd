@@ -249,21 +249,23 @@ body.noscroll {
 .exam-list-content .exam-list-row-working,
 .exam-list-content .exam-list-row-working td {
 	color: #ffffff;
-	background-color: rgba(25, 190, 107, .5);
+	background-color: rgba(25, 190, 107, .7);
 }
 
 .exam-list-content .exam-list-row-begun {
 	color: #bbbec4;
-	background-color: rgba(221, 222, 225, .5);
+	background-color: rgba(221, 222, 225, .3);
 }
 
 .exam-list-content .exam-list-row-finish,
 .exam-list-content .exam-list-row-finish td {
 	color: #bbbec4;
-	background-color: rgba(247, 247, 247, .5);
+	background-color: rgba(247, 247, 247, .7);
 }
 
 .exam-list-content .exam-list-row-cancellation,
 .exam-list-content .exam-list-row-cancellation td {
 	text-decoration: line-through;
+	color: #bbbec4;
+	background-color: rgba(247, 247, 247, .7);
 }

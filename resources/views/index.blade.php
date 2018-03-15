@@ -19,11 +19,11 @@
 							<icon type="ios-home-outline"></icon>
 							某某单位
 						</breadcrumb-item>
-						<breadcrumb-item to="/components/breadcrumb">
+						<breadcrumb-item to="/">
 							<icon type="social-buffer-outline"></icon>
 							张三
 						</breadcrumb-item>
-						<breadcrumb-item to="/components/breadcrumb">
+						<breadcrumb-item to="/">
 							<icon type="log-out"></icon>
 							退出
 						</breadcrumb-item>
