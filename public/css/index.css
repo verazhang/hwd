@@ -232,13 +232,38 @@ body.noscroll {
 .ivu-tree {
 	overflow: auto;
 }
-.model-question .ivu-row{
+
+.model-question .ivu-row {
 	height: 48px;
 	line-height: 48px;
 }
-.model-question  .ivu-row .ivu-col >a{
+
+.model-question .ivu-row .ivu-col>a {
 	margin-right: 22px;
 }
-.exam-list-content{
+
+.exam-list-content {
 	overflow: auto;
+}
+
+.exam-list-content .exam-list-row-working,
+.exam-list-content .exam-list-row-working td {
+	color: #ffffff;
+	background-color: rgba(25, 190, 107, .5);
+}
+
+.exam-list-content .exam-list-row-begun {
+	color: #bbbec4;
+	background-color: rgba(221, 222, 225, .5);
+}
+
+.exam-list-content .exam-list-row-finish,
+.exam-list-content .exam-list-row-finish td {
+	color: #bbbec4;
+	background-color: rgba(247, 247, 247, .5);
+}
+
+.exam-list-content .exam-list-row-cancellation,
+.exam-list-content .exam-list-row-cancellation td {
+	text-decoration: line-through;
 }

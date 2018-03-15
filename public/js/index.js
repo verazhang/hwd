@@ -251,10 +251,85 @@ define(function(require, exports, module) {
 					var ms = menuID.split('-');
 					menuID == '1-2' ? this.showDocEdit = true : this.showDocEdit = false;
 					menuID == '3-1' ? this.showUnitEdit = true : this.showUnitEdit = false;
+					menuID == '2-3' ? (this.examTableCols(), this.examTableData()) : '';
 					this.activeMenu = ms[0];
 					this.$nextTick(function() {
 						this.spinShow = false;
 					});
+				},
+				examTableCols: function() {
+					this.examCols = [{
+							title: '考试编号',
+							key: 'examnum'
+						}, {
+							title: '试卷编号',
+							key: 'serialnum'
+						},
+						{
+							title: '试卷名称',
+							key: 'title',
+							ellipsis: true,
+							width: 320
+						},
+						{
+							title: '总分',
+							key: 'fraction'
+						}, {
+							title: '题数',
+							key: 'update_at'
+						}, {
+							title: '时限',
+							key: 'duration'
+						}, {
+							title: '开始时间',
+							key: 'create_at'
+						}, {
+							title: '录入者',
+							key: 'user_name'
+						}, {
+							title: '考试状态',
+							key: 'status'
+						}, {
+							title: '操作',
+							key: 'action',
+							width: 200,
+							align: 'center',
+							render: (h, params) => {
+								return h('div', [
+									h('a', {
+										props: {
+											did: params['row']['_id']
+										},
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												console.log(arguments, '预览操作');
+												window.open('../exam/' + Mock.mock('@natural()'))
+											}
+										}
+									}, '预览'),
+									h('a', {
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												this.$Modal.info({
+													title: "提示信息",
+													content: "功能完善中"
+												});
+											}
+										}
+									}, '参考人员')
+								]);
+							}
+						}
+					];
+				},
+				examTableData: function() {
+					this.examList = getQuestionDoc();
 				},
 				//文档菜单节点选中事件
 				docMenuSelect: function(node) {
@@ -296,6 +371,21 @@ define(function(require, exports, module) {
 				//删除用户操作
 				removeUser: function() {
 					console.log('删除用户', arguments);
+				},
+				rowClassName:function(row, index){
+					/*if(row['status'] =='考试中'){
+						return 'exam-list-row-working';
+					}
+					if(row['status'] =='未考试'){
+						return 'exam-list-row-begun';
+					}
+					if(row['status'] =='考试结束'){
+						return 'exam-list-row-finish';
+					}
+					if(row['status'] =='作废'){
+						return 'exam-list-row-cancellation';
+					}*/
+					return "";
 				},
 				//编辑文档导航树节点
 				renderDocTree: function(h, {
@@ -676,9 +766,10 @@ define(function(require, exports, module) {
 			qdl = getQuestionDocList();
 			qds.push({
 				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(10, 30)'),
+				"title": i %2 == 0 ? '传输设备（多选题）' : '传输设备（单选题）',
 				"question": qdl,
 				"questiontext": analyQuestionDoc(qdl),
+				"examnum": Mock.mock('@integer(2, 20)'),
 				"serialnum": Mock.mock({
 					'regexp|3': /\d{2,5}/
 				}).regexp,
