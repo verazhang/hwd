@@ -8,10 +8,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use App\Document;
-use App\DocumentContent;
-use App\Type;
+use App\Models\Document;
+use App\Models\DocumentContent;
+use App\Models\Type;
 
 class DocumentController extends Controller
 {
@@ -26,6 +25,36 @@ class DocumentController extends Controller
             return [];
         }
         return $result->toJson();
+    }
+
+    public function add()
+    {
+        $items = ['docid', 'proid', 'pro', 'nav', 'content'];
+        $values = $content = [];
+        foreach ($items as $param) {
+            if ($param == "content") {
+                $content = request($param);
+            } else {
+                $values[$param] = request($param);
+            }
+        }
+
+        //@todo
+        $values['user_id'] = 0;
+        $model = new Document();
+
+        $model->setRawAttributes($values);
+        $result = $model->save();
+        //add content
+        if ($result) {
+            $contentModel = new DocumentContent();
+            $contentModel->setAttribute('docid', $model->_id);
+            $contentModel->setAttribute('content', $content);
+            $result = $contentModel->save();
+            return $this->getBoolResult($result);
+        } else {
+            return $this->getBoolResult(false);
+        }
     }
 
     /**
@@ -46,7 +75,7 @@ class DocumentController extends Controller
     public function getTypeList()
     {
         $result = Type::get()->pluck("_id", "proname");
-        return $result ? $result->toJson() : [];
+        return $this->resultJson(self::STATUS_SUCCESS, $result);
     }
 
     /**

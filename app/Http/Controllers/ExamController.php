@@ -19,8 +19,7 @@ class ExamController extends Controller
         $items = ['type', 'title', 'content', 'options', 'option'];
         $values = [];
         foreach ($items as $param) {
-            $item = request($param);
-            $values[$param] = $item;
+            $values[$param] = request($param);
         }
 
         $values['status'] = ExamContent::STATUS_CREATE;
@@ -68,10 +67,7 @@ class ExamController extends Controller
         $items = ['title', 'question', 'examtime', 'delay', 'duration', 'fraction', 'testcnt', 'viewcnt'];
         $values = [];
         foreach ($items as $param) {
-            $item = request($param);
-            if ($item) {
-                $values[$param] = $item;
-            }
+            $values[$param] = request($param);
         }
         $values['delay'] = $values['delay'] ? $values['delay'] : 0;
         $values['viewcnt'] = $values['viewcnt'] ? $values['viewcnt'] : 0;
@@ -121,10 +117,7 @@ class ExamController extends Controller
         $items = ['exampaperid', 'fraction', 'question', 'start_time', 'end_time'];
         $values = [];
         foreach ($items as $param) {
-            $item = request($param);
-            if ($item) {
-                $values[$param] = $item;
-            }
+            $values[$param] = request($param);
         }
 
         $values['status'] = Exam::STATUS_END;

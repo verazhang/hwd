@@ -31,6 +31,7 @@ Route::get('product/remove/{code}','ProductController@remove');
 
 //知识查询、维护
 Route::get('document/get/{docid}', 'DocumentController@get');
+Route::post('document/add', 'DocumentController@add');
 Route::get('document/content/{contentid}', 'DocumentController@getContent');
 Route::get('document/type', 'DocumentController@getTypeList');
 Route::get('document/search', 'DocumentController@search');
@@ -53,4 +54,8 @@ Route::post('unit/add', 'UnitController@add');
 Route::post('unit/edit/{unitid}', 'UnitController@edit');
 Route::post('unit/delete/{unitid}', 'UnitController@delete');
 Route::get('unit/get', 'UnitController@get');
-
+//用户管理
+Route::post('user/add', 'UserController@add');
+Route::post('user/edit/{userid}', 'UserController@edit');
+Route::post('user/delete/{userid}', 'UserController@delete');
+Route::get('user/get/{unitid?}', 'UserController@get');
