@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 		avh = avh - 64 - 43;
 		getAjaxProListData();
 		getAjaxDocsTreeData(initVueObject);
+		getAjaxDocData();
 	}
 
 	function initVueObject() {
@@ -125,7 +126,7 @@ define(function(require, exports, module) {
 					questionList: getQuestionBank(), //题库资料
 					meExaminationStartDate: '', //考试开始时间
 					meExaminationEndDate: '', //考试结束时间
-					meExaminationList: getMeExaminationList(), //我的试卷列表
+					//meExaminationList: getMeExaminationList(), //我的试卷列表
 					examinaStatus: '考试中', //考试状态选择
 					examinaStatusList: ['未开始', '考试中', '已结束'], //考试状态列表
 					examinakeywords: '', //考试管理关键词
@@ -251,10 +252,154 @@ define(function(require, exports, module) {
 					var ms = menuID.split('-');
 					menuID == '1-2' ? this.showDocEdit = true : this.showDocEdit = false;
 					menuID == '3-1' ? this.showUnitEdit = true : this.showUnitEdit = false;
+					menuID == '2-3' ? (this.examTableCols(), this.examTableData()) : '';
+					menuID == '2-4' ? (this.meExamTableCols(), this.meExamTableData()) : '';
 					this.activeMenu = ms[0];
 					this.$nextTick(function() {
 						this.spinShow = false;
 					});
+				},
+				examTableCols: function() {
+					this.examCols = [{
+							title: '考试编号',
+							key: 'examnum'
+						}, {
+							title: '试卷编号',
+							key: 'serialnum'
+						},
+						{
+							title: '试卷名称',
+							key: 'title',
+							ellipsis: true,
+							width: 320
+						},
+						{
+							title: '总分',
+							key: 'fraction'
+						}, {
+							title: '题数',
+							key: 'update_at'
+						}, {
+							title: '时限',
+							key: 'duration'
+						}, {
+							title: '开始时间',
+							key: 'create_at'
+						}, {
+							title: '录入者',
+							key: 'user_name'
+						}, {
+							title: '考试状态',
+							key: 'status'
+						}, {
+							title: '操作',
+							key: 'action',
+							width: 200,
+							align: 'center',
+							render: (h, params) => {
+								return h('div', [
+									h('a', {
+										props: {
+											did: params['row']['_id']
+										},
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												console.log(arguments, '预览操作');
+												window.open('../exam/' + Mock.mock('@natural()'))
+											}
+										}
+									}, '预览'),
+									h('a', {
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												window.open('../examparti/' + Mock.mock('@natural()'))
+											}
+										}
+									}, '参考人员')
+								]);
+							}
+						}
+					];
+				},
+				examTableData: function() {
+					this.examList = getQuestionDoc();
+				},
+				meExamTableCols: function() {
+					this.examCols = [{
+							title: '考试编号',
+							key: 'examnum'
+						}, {
+							title: '试卷编号',
+							key: 'serialnum'
+						},
+						{
+							title: '试卷名称',
+							key: 'title',
+							ellipsis: true,
+							width: 320
+						},
+						{
+							title: '总分',
+							key: 'fraction'
+						}, {
+							title: '题数',
+							key: 'update_at'
+						}, {
+							title: '时限',
+							key: 'duration'
+						}, {
+							title: '开始时间',
+							key: 'create_at'
+						}, {
+							title: '录入者',
+							key: 'user_name'
+						}, {
+							title: '考试状态',
+							key: 'status'
+						}, {
+							title: '操作',
+							key: 'action',
+							width: 200,
+							align: 'center',
+							render: (h, params) => {
+								return h('div', [
+									h('a', {
+										props: {
+											did: params['row']['_id']
+										},
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												console.log(arguments, '预览操作');
+												window.open('../exam/' + Mock.mock('@natural()'))
+											}
+										}
+									}, '查看结果'),
+									h('a', {
+										style: {
+											marginRight: '5px'
+										},
+										on: {
+											click: () => {
+												window.open('../exam/' + Mock.mock('@natural()'))
+											}
+										}
+									}, '参与考试')
+								]);
+							}
+						}
+					];
+				},
+				meExamTableData: function() {
+					this.examList = getQuestionDoc();
 				},
 				//文档菜单节点选中事件
 				docMenuSelect: function(node) {
@@ -267,9 +412,7 @@ define(function(require, exports, module) {
 						this.breadcrumb = bdc.concat(str);
 					}
 					this.docSpinShow = true;
-					console.log('节点点击', node);
 					node && node[0] && node[0].targetid && getAjaxDocData(node[0].targetid);
-					//加载对应的文档数据getAjaxDocData
 				},
 				//获取文档节点选中后节点列表标题数组
 				getSelectedNodeParentNodesStr: function(nodes) {
@@ -296,6 +439,21 @@ define(function(require, exports, module) {
 				//删除用户操作
 				removeUser: function() {
 					console.log('删除用户', arguments);
+				},
+				rowClassName: function(row, index) {
+					/*if(row['status'] =='考试中'){
+						return 'exam-list-row-working';
+					}
+					if(row['status'] =='未考试'){
+						return 'exam-list-row-begun';
+					}
+					if(row['status'] =='考试结束'){
+						return 'exam-list-row-finish';
+					}
+					if(row['status'] =='作废'){
+						return 'exam-list-row-cancellation';
+					}*/
+					return "";
 				},
 				//编辑文档导航树节点
 				renderDocTree: function(h, {
@@ -606,7 +764,8 @@ define(function(require, exports, module) {
 	 */
 	function getAjaxDocsTreeData(callback) {
 		opt.model._ajaxGetDataInterFace({
-			inter: '../js/tree.json'
+			inter: 'data/tree.json',
+			method: 'GET'
 		}, function(result) {
 			//console.log('返回结果',result);
 			if(result) {
@@ -625,7 +784,7 @@ define(function(require, exports, module) {
 	 * 获取异步数据接口
 	 */
 	function getAjaxDocData(tarid) {
-		if(itemDoc['docs'] && itemDoc['docs'].length > 0) {
+		if(itemDoc && itemDoc['docs'] && itemDoc['docs'].length > 0) {
 			var docs = itemDoc['docs'].filter(function(el) {
 				return el._id == tarid;
 			});
@@ -635,9 +794,9 @@ define(function(require, exports, module) {
 			});
 		} else {
 			opt.model._ajaxGetDataInterFace({
-				inter: '../js/docs.json'
+				inter: 'data/docs.json',
+				method: 'GET'
 			}, function(result) {
-				console.log('返回结果', result);
 				if(result) {
 					itemDoc['docs'] = result;
 				}
@@ -656,7 +815,8 @@ define(function(require, exports, module) {
 	 */
 	function getAjaxProListData(callback) {
 		opt.model._ajaxGetDataInterFace({
-			inter: '../js/pro.json'
+			inter: 'data/pro.json',
+			method: 'GET'
 		}, function(result) {
 			//console.log('返回结果',result);
 			if(result) {
@@ -671,14 +831,17 @@ define(function(require, exports, module) {
 	function getQuestionDoc() {
 		var len = Mock.mock('@integer(2, 20)'),
 			qds = [],
+			k = 0,
 			qdl = [];
 		for(var i = 0; i < len; i++) {
 			qdl = getQuestionDocList();
+			k = Mock.mock('@integer(0,3)');
 			qds.push({
 				"_id": Mock.mock('@string(32)'),
-				"title": Mock.mock('@ctitle(10, 30)'),
+				"title": i % 2 == 0 ? '传输设备（多选题）' : '传输设备（单选题）',
 				"question": qdl,
 				"questiontext": analyQuestionDoc(qdl),
+				"examnum": Mock.mock('@integer(2, 20)'),
 				"serialnum": Mock.mock({
 					'regexp|3': /\d{2,5}/
 				}).regexp,
@@ -690,7 +853,10 @@ define(function(require, exports, module) {
 				"duration": Mock.mock('@integer(30,120)'),
 				"user_id": '',
 				"user_name": Mock.mock('@cname'),
-				"status": ['未考试', '考试中', '考试结束', '作废'][Mock.mock('@integer(0,3)')],
+				"status": ['未考试', '考试中', '考试结束', '作废'][k],
+				"cellClassName": {
+					status: 'exam-list-row-' + ['begun', 'working', 'finish', 'cancellation'][k]
+				},
 				"create_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
 				"update_at": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
 			});

@@ -23,6 +23,9 @@ Route::get('/examlist/{type}', function () {
 Route::get('/exam/{examid}', function () {
     return view('showexam');
 });
+Route::get('/examparti/{examid}', function () {
+    return view('examparti');
+});
 Route::get('mongo','MongoController@index');
 Route::get('test','ProductController@test');
 Route::get('product','ProductController@index');

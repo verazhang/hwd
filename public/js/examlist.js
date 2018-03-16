@@ -60,16 +60,16 @@ define(function(require, exports, module) {
 							render: (h, params) => {
 								return h('div', [
 									h('a', {
-										props:{
-											did:params['row']['_id']
+										props: {
+											did: params['row']['_id']
 										},
 										style: {
 											marginRight: '5px'
 										},
 										on: {
 											click: () => {
-												console.log(arguments,'预览操作');
-												window.open('../exam/'+Mock.mock('@natural()'))
+												console.log(arguments, '预览操作');
+												window.open('../exam/' + Mock.mock('@natural()'))
 											}
 										}
 									}, '预览'),
@@ -127,6 +127,9 @@ define(function(require, exports, module) {
 					this.unit = n[0];
 					this.userList = getUnitUserList();
 					//如果是用户管理就加载用户列表数据
+				},
+				rowClassName: function(row, index) {
+					return "";
 				}
 			}
 		}

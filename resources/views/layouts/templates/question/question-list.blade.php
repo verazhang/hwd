@@ -1,5 +1,5 @@
 <template>
-	<card v-for="(ql, idx) in questionList" :key="idx" :did="doc._id" class="question-item" :data-pro="ql.type">
+	<card v-for="(ql, idx) in questionList" :key="idx" :did="ql._id" class="question-item" :data-pro="ql.type">
 		<p slot="title" v-text="'【' + ql.type_text + '】' + ql.title">
 			<icon type="ios-film-outline"></icon>
 		</p>

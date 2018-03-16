@@ -19,11 +19,11 @@
 							<icon type="ios-home-outline"></icon>
 							某某单位
 						</breadcrumb-item>
-						<breadcrumb-item to="/components/breadcrumb">
+						<breadcrumb-item to="/">
 							<icon type="social-buffer-outline"></icon>
 							张三
 						</breadcrumb-item>
-						<breadcrumb-item to="/components/breadcrumb">
+						<breadcrumb-item to="/">
 							<icon type="log-out"></icon>
 							退出
 						</breadcrumb-item>
@@ -58,6 +58,16 @@
 					@include('layouts.templates.question.exam-nav')
 				</section>
 				<section v-else-if="menuID=='2-3'" class="model-examination">
+					<row style="margin-top: 22px;margin-bottom: 22px;">
+						<i-col span="18">
+							<h4>考试列表 </h4>
+						</i-col>
+						<i-col span="6" style="text-align: right;">
+							<i-button>
+								新增
+							</i-button>
+						</i-col>
+					</row>
 					@include('layouts.templates.question.exam-list')
 					<Page :total="100" show-sizer></Page>
 				</section>
