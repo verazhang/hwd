@@ -60,6 +60,6 @@ class UserController extends Controller
         }
         $result = $model->get();
 
-        return $this->resultJson(self::STATUS_SUCCESS, $result);
+        return $this->resultJson($result);
     }
 }

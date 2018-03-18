@@ -62,3 +62,7 @@ Route::post('user/add', 'UserController@add');
 Route::post('user/edit/{userid}', 'UserController@edit');
 Route::post('user/delete/{userid}', 'UserController@delete');
 Route::get('user/get/{unitid?}', 'UserController@get');
+
+Route::auth();
+
+Route::get('/home', 'HomeController@index');

@@ -50,7 +50,7 @@ class UnitController extends Controller
 
         $result = $this->addNode($source, $parents->get());
 
-        return $this->resultJson(self::STATUS_SUCCESS, $result);
+        return $this->resultJson($result);
     }
 
     private function addNode($source, $collection)
