@@ -22,6 +22,8 @@ import os
 _DOC_ID=['EDOC1000036635']
 _DATABASE_NAME ='knl'
 _DOC_CONTENT = []
+_DOC_TREE_CONTENT = []
+_PRO_NAME =''
 
 #
 #console.log(j, h, c, l, b, a, null, k)
@@ -52,6 +54,26 @@ def ModelDocTreeNode(title,targetid,href,ohref,libid,libversion,toclib,tocv,hib,
             'topicid':topicid,
             'sub':sub,
             'children':[]
+          }
+def ModelDocNewTreeNode(title,targetid,href,ohref,libid,libversion,toclib,tocv,hib,topicid,sub,content,user_id,pro,parentid):
+    return {'_id':cUIDStr(),
+            'title':title,
+            'targetid':targetid,
+            'href':href,
+            'ohref':ohref,
+            'libid':libid,
+            'libversion':libversion,
+            'toclib':toclib,
+            'tocv':tocv,
+            'hib': hib,
+            'topicid':topicid,
+            'sub':sub,
+            'content':content + '',
+            'user_id':user_id,
+            'pro':pro,
+            'parentid':parentid,
+            'created_at':GetNowTime(),
+            'updated_at':GetNowTime()
           }
 
 def ModelDocContent(content,user_id):
@@ -164,7 +186,7 @@ def getTargetID(docc):
     return docc['_id']
 
 def getHib(hib,idx):
-	return hib+'.%d'%(idx+1)
+    return hib+'.%d'%(idx+1)
 
 def insertData(jsonObj,table):
     _DB_CONN[table].insert(jsonObj)
@@ -180,6 +202,7 @@ def crawlerUrl(docid):
     lis = ul[len(ul)-1].findAll('li')
     title = soup.find(id="libName_A_link")
     print(title.string)
+    _PRO_NAME = title.string
     KnlDoc = ModelProductDoc(docid,title.string,title.string,'5406')
     for liIter in lis : 
         print("********************************************************")
@@ -201,13 +224,30 @@ def crawlerUrl(docid):
             except:
                print('获取子菜单报错')
         print("抓取网页文档*********************************************",len(_DOC_CONTENT))
-    insertData(KnlDoc,'doc')
-    insertData(_DOC_CONTENT,'doccontent')
+    resetTree(KnlDoc)
+    insertData(KnlDoc,'document')
+    insertData(_DOC_TREE_CONTENT,'document_content')
     with open("../public/js/tree.json", "w") as trf:
         trf.write(json.dumps(KnlDoc))
     with open("../public/js/docs.json", "w") as docf:
-        docf.write(json.dumps(_DOC_CONTENT))
-
+        docf.write(json.dumps(_DOC_TREE_CONTENT))
+def resetTree(kd):
+    tree = KnlDoc['navtree']
+    getTreeNode(tree,{'_id':''})
+    
+def getTreeNodeContent(_id):
+    for cnt in _DOC_CONTENT:
+        if cnt['_id'] == _id :
+           return cnt['content']
+    return ''
+     
+def getTreeNode(node,parentnode):
+    for n in node: 
+        if len(n['children']) > 1 :
+           getTreeNode(n['children'],n)
+        print(n['_id'],n['title'])
+        _DOC_TREE_CONTENT.append(ModelDocNewTreeNode(n['title'],n['targetid'],n['href'],n['ohref'],n['libid'],n['libversion'],n['toclib'],n['tocv'],n['hib'],n['topicid'],n['sub'],getTreeNodeContent(n['targetid']),'5406',_PRO_NAME,parentnode['_id']))
+  
 def main():
     conn = MC('mongodb://localhost:27017/')
     global _DB_CONN 
