@@ -59,7 +59,7 @@ class ExamController extends Controller
     public function getContent()
     {
         $result = ExamContent::get();
-        return $this->resultJson(self::STATUS_SUCCESS, $result);
+        return $this->resultJson($result);
     }
 
     public function add()
@@ -109,7 +109,7 @@ class ExamController extends Controller
     public function get()
     {
         $result = Exam::get();
-        return $this->resultJson(self::STATUS_SUCCESS, $result);
+        return $this->resultJson($result);
     }
 
     public function addResult()
@@ -138,6 +138,6 @@ class ExamController extends Controller
             $model = $model->where(["user_id"=>$user_id]);
         }
         $result = $model->get();
-        return $this->resultJson(self::STATUS_SUCCESS, $result);
+        return $this->resultJson($result);
     }
 }

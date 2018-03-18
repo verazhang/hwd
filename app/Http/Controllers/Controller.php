@@ -22,7 +22,7 @@ class Controller extends BaseController
      * @param array $extra
      * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function resultJson($success = 1, $data = '', $message = '', $extra = [])
+    public function resultJson($data = '', $success = self::STATUS_SUCCESS, $message = '', $extra = [])
     {
         $source = ['success' => $success, 'msg' => $message, 'data' => $data];
         return response()->json(array_merge($source, $extra));
@@ -35,6 +35,6 @@ class Controller extends BaseController
      */
     protected function getBoolResult($result)
     {
-        return $this->resultJson($result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
+        return $this->resultJson('', $result ? self::STATUS_SUCCESS : self::STATUS_FAIL);
     }
 }

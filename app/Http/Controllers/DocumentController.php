@@ -21,10 +21,11 @@ class DocumentController extends Controller
     public function get($docid)
     {
         $result = Document::where(['docid'=>$docid])->first();
+
         if (!$result) {
             return [];
         }
-        return $result->toJson();
+        return $this->resultJson($result);
     }
 
     public function add()
@@ -64,8 +65,8 @@ class DocumentController extends Controller
      */
     public function getContent($contentid)
     {
-        $result = DocumentContent::where(['_id'=>$contentid])->first();
-        return $result ? $result->toJson() : [];
+        $result = DocumentContent::find($contentid);
+        return $this->resultJson($result);
     }
 
     /**
@@ -75,16 +76,20 @@ class DocumentController extends Controller
     public function getTypeList()
     {
         $result = Type::get()->pluck("_id", "proname");
-        return $this->resultJson(self::STATUS_SUCCESS, $result);
+        return $this->resultJson($result);
     }
 
     /**
      * search document content by keywords
      * @return document
      */
-    public function search(Request $request)
+    public function search()
     {
-        $keywords = $request->input("keywords");
+        $keywords = request("keywords");
+        $result = DocumentContent::where("content", "like", "%".$keywords."%")->where("title", "like", "%{$keywords}%")
+            ->get();
+
+        return $this->resultJson($result);
         //@todo search by content or document?
     }
 }
