@@ -66,6 +66,9 @@ class DocumentController extends Controller
     public function getContent($contentid)
     {
         $result = DocumentContent::find($contentid);
+		if(empty($result)){
+			$result = DocumentContent::where('targetid',$contentid)->first();
+		}
         return $this->resultJson($result);
     }
 

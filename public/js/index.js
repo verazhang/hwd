@@ -7,7 +7,6 @@ define(function(require, exports, module) {
 		avh = avh - 64 - 43;
 		getAjaxProListData();
 		getAjaxDocsTreeData(initVueObject);
-		getAjaxDocData();
 	}
 
 	function initVueObject() {
@@ -784,26 +783,21 @@ define(function(require, exports, module) {
 	 * 获取异步数据接口
 	 */
 	function getAjaxDocData(tarid) {
-		if(itemDoc && itemDoc['docs'] && itemDoc['docs'].length > 0) {
-			var docs = itemDoc['docs'].filter(function(el) {
-				return el._id == tarid;
-			});
-			docs && docs.length > 0 ? pVue.item.content = docs[0] : pVue.item.content = null;
+		if(itemDoc && itemDoc['cacheDocs'] && itemDoc['cacheDocs'][tarid]) {
+			pVue.item.content = itemDoc['cacheDocs'][tarid];
 			pVue.$nextTick(function() {
 				pVue.docSpinShow = false;
 			});
 		} else {
 			opt.model._ajaxGetDataInterFace({
-				inter: 'data/docs.json',
+				inter: 'document/content/' + tarid,
 				method: 'GET'
 			}, function(result) {
-				if(result) {
-					itemDoc['docs'] = result;
+				if(result && result.success == 1 && result.data) {
+					itemDoc['cacheDocs'] ? '' : itemDoc['cacheDocs'] = {};
+					itemDoc['cacheDocs'][tarid] = result.data;
+					result.data['content'] ? pVue.item.content = result.data['content'] : pVue.item.content = null;
 				}
-				var docs = itemDoc['docs'].filter(function(el) {
-					return el._id == tarid;
-				});
-				docs && docs.length > 0 ? pVue.item.content = docs[0] : pVue.item.content = null;
 				pVue.$nextTick(function() {
 					pVue.docSpinShow = false;
 				});

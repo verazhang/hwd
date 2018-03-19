@@ -563,6 +563,7 @@
  .doc-content .hwcopyright {
  	text-align: center;
  	font-family: Arial;
+ 	display: none;
  }
  
  .doc-content .comment {

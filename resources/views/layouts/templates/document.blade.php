@@ -10,7 +10,7 @@
 				</breadcrumb-item>
 			</breadcrumb>
 			<spin size="large" fix v-if="docSpinShow"></spin>
-			<i-content class="doc-content" v-html="item.content.content || '该文档还不存在'" :style="{padding: '0 16px', minHeight: '280px'}"></i-content>
+			<i-content class="doc-content" v-html="item.content || '该文档还不存在'" :style="{padding: '0 16px', minHeight: '280px'}"></i-content>
 		</layout>
 	</layout>
 </template>
