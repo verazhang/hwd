@@ -1,4 +1,6 @@
-<?php namespace Jenssegers\Mongodb\Schema;
+<?php
+
+namespace Jenssegers\Mongodb\Schema;
 
 use Closure;
 use Jenssegers\Mongodb\Connection;
@@ -6,9 +8,7 @@ use Jenssegers\Mongodb\Connection;
 class Builder extends \Illuminate\Database\Schema\Builder
 {
     /**
-     * Create a new database Schema manager.
-     *
-     * @param  Connection  $connection
+     * @inheritdoc
      */
     public function __construct(Connection $connection)
     {
@@ -16,11 +16,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     }
 
     /**
-     * Determine if the given table has a given column.
-     *
-     * @param  string  $table
-     * @param  string  $column
-     * @return bool
+     * @inheritdoc
      */
     public function hasColumn($table, $column)
     {
@@ -28,34 +24,34 @@ class Builder extends \Illuminate\Database\Schema\Builder
     }
 
     /**
-     * Determine if the given table has given columns.
-     *
-     * @param  string  $table
-     * @param  array   $columns
-     * @return bool
+     * @inheritdoc
      */
     public function hasColumns($table, array $columns)
     {
         return true;
     }
+
     /**
      * Determine if the given collection exists.
      *
-     * @param  string  $collection
+     * @param  string $collection
      * @return bool
      */
     public function hasCollection($collection)
     {
         $db = $this->connection->getMongoDB();
 
-        return in_array($collection, $db->getCollectionNames());
+        foreach ($db->listCollections() as $collectionFromMongo) {
+            if ($collectionFromMongo->getName() == $collection) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Determine if the given collection exists.
-     *
-     * @param  string  $collection
-     * @return bool
+     * @inheritdoc
      */
     public function hasTable($collection)
     {
@@ -65,8 +61,8 @@ class Builder extends \Illuminate\Database\Schema\Builder
     /**
      * Modify a collection on the schema.
      *
-     * @param  string   $collection
-     * @param  Closure  $callback
+     * @param  string $collection
+     * @param  Closure $callback
      * @return bool
      */
     public function collection($collection, Closure $callback)
@@ -79,11 +75,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     }
 
     /**
-     * Modify a collection on the schema.
-     *
-     * @param  string   $collection
-     * @param  Closure  $callback
-     * @return bool
+     * @inheritdoc
      */
     public function table($collection, Closure $callback)
     {
@@ -91,11 +83,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     }
 
     /**
-     * Create a new collection on the schema.
-     *
-     * @param  string   $collection
-     * @param  Closure  $callback
-     * @return bool
+     * @inheritdoc
      */
     public function create($collection, Closure $callback = null)
     {
@@ -109,10 +97,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     }
 
     /**
-     * Drop a collection from the schema.
-     *
-     * @param  string  $collection
-     * @return bool
+     * @inheritdoc
      */
     public function drop($collection)
     {
@@ -122,10 +107,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     }
 
     /**
-     * Create a new Blueprint.
-     *
-     * @param  string   $collection
-     * @return Schema\Blueprint
+     * @inheritdoc
      */
     protected function createBlueprint($collection, Closure $callback = null)
     {
