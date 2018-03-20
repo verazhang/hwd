@@ -6,8 +6,8 @@
     "type": "project",
     "require": {
     	"php": ">=5.6.4",
-    	"laravel/framework": "5.5.*",
-        "jenssegers/mongodb": "v3.3.*"
+    	"laravel/framework": "5.6.*",
+        "jenssegers/mongodb": "v3.4.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
