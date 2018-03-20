@@ -823,7 +823,7 @@ define(function(require, exports, module) {
 	 * 获取试卷列表
 	 */
 	function getQuestionDoc() {
-		var len = Mock.mock('@integer(2, 20)'),
+		var len = 2,
 			qds = [],
 			k = 0,
 			qdl = [];
