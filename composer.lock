@@ -229,7 +229,7 @@
                 "parser"
             ],
             "time": "2018-03-08T01:11:30+00:00"
-        }
+        },
         {
             "name": "laravel/framework",
             "version": "v5.5.39",
