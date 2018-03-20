@@ -69,6 +69,9 @@ class DocumentController extends Controller
 		if(empty($result)){
 			$result = DocumentContent::where('targetid',$contentid)->first();
 		}
+		if(!empty($result)){
+			$result['content'] = str_replace(["\r\n","\r","\n"], "<br />", $result['content']);
+		}
         return $this->resultJson($result);
     }
 
