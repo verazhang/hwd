@@ -796,7 +796,7 @@ define(function(require, exports, module) {
 				if(result && result.success == 1 && result.data) {
 					itemDoc['cacheDocs'] ? '' : itemDoc['cacheDocs'] = {};
 					itemDoc['cacheDocs'][tarid] = result.data;
-					result.data['content'] ? pVue.item.content = result.data['content'] : pVue.item.content = null;
+					result.data['content'] ? pVue.item.content = result.data : pVue.item.content = {};
 				}
 				pVue.$nextTick(function() {
 					pVue.docSpinShow = false;
