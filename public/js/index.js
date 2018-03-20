@@ -837,7 +837,7 @@ define(function(require, exports, module) {
 				"questiontext": analyQuestionDoc(qdl),
 				"examnum": Mock.mock('@integer(2, 20)'),
 				"serialnum": Mock.mock({
-					'regexp|3': /\d{2,5}/
+					'regexp|3': /\d{2}/
 				}).regexp,
 				"examtime": Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")'),
 				"fraction": Mock.mock('@integer(70,150)'),
