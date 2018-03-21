@@ -140,14 +140,17 @@ define(function(require, exports, module) {
 							title: '试卷名称',
 							key: 'title',
 							ellipsis: true,
-							width: 320
+							width: 150
 						},
 						{
 							title: '总分',
 							key: 'fraction'
 						}, {
 							title: '题数',
-							key: 'update_at'
+							key: 'question',
+							render: (h, params) => {
+								return h('span', {}, params['row']['question'].length);
+							}
 						}, {
 							title: '时限',
 							key: 'duration'
@@ -159,7 +162,8 @@ define(function(require, exports, module) {
 							key: 'testcnt'
 						}, {
 							title: '出卷时间',
-							key: 'create_at'
+							key: 'create_at',
+							width: 150
 						}, {
 							title: '录入者',
 							key: 'user_name'
@@ -270,20 +274,24 @@ define(function(require, exports, module) {
 							title: '试卷名称',
 							key: 'title',
 							ellipsis: true,
-							width: 320
+							width: 150
 						},
 						{
 							title: '总分',
 							key: 'fraction'
 						}, {
 							title: '题数',
-							key: 'update_at'
+							key: 'question',
+							render: (h, params) => {
+								return h('span', {}, params['row']['question'].length);
+							}
 						}, {
 							title: '时限',
 							key: 'duration'
 						}, {
 							title: '开始时间',
-							key: 'create_at'
+							key: 'create_at',
+							width: 150
 						}, {
 							title: '录入者',
 							key: 'user_name'
@@ -306,7 +314,6 @@ define(function(require, exports, module) {
 										},
 										on: {
 											click: () => {
-												console.log(arguments, '预览操作');
 												window.open('../exam/' + Mock.mock('@natural()'))
 											}
 										}
@@ -341,20 +348,24 @@ define(function(require, exports, module) {
 							title: '试卷名称',
 							key: 'title',
 							ellipsis: true,
-							width: 320
+							width: 150
 						},
 						{
 							title: '总分',
 							key: 'fraction'
 						}, {
 							title: '题数',
-							key: 'update_at'
+							key: 'question',
+							render: (h, params) => {
+								return h('span', {}, params['row']['question'].length);
+							}
 						}, {
 							title: '时限',
 							key: 'duration'
 						}, {
 							title: '开始时间',
-							key: 'create_at'
+							key: 'create_at',
+							width: 150
 						}, {
 							title: '录入者',
 							key: 'user_name'
