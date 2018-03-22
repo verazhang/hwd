@@ -6,7 +6,7 @@
 			</form-item>
 			<form-item label="型号">
 				<i-select v-model="proModel" filterable>
-					<i-option dis-hover v-for="(item, index) in proModels" :key="index" :value="item" v-text="item"></i-option>
+					<i-option dis-hover v-for="(item, index) in proModels" :key="index" :value="item.type" v-text="item.type"></i-option>
 				</i-select>
 			</form-item>
 			<form-item label="">

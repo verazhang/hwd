@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Log;
 
 class UserController extends Controller
 {
@@ -48,7 +49,11 @@ class UserController extends Controller
     public function delete($user_id)
     {
         $model = User::where(["_id"=>$user_id])->first();
-        $result = $model->delete();
+		if(!empty($model)){
+			$result = $model->delete();
+		}else{
+			$result = "";
+		}
         return $this->getBoolResult($result);
     }
 

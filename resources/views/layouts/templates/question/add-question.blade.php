@@ -5,7 +5,7 @@
 				<i-form :label-width="80">
 					<form-item label="题目">
 						<i-input v-model="newQuestionList.ques1.title" placeholder="题目内容"></i-input>
-						<i-button v-if="newQuestionList.ques1.options.length<4" type="default" size="small" dtype="ques1" @click="addQuesOptions">
+						<i-button v-if="newQuestionList.ques1.options.length<4" type="default" dtype="ques1" @click="addQuesOptions">
 							增加选项
 						</i-button>
 					</form-item>
@@ -18,7 +18,7 @@
 				<i-form :label-width="80">
 					<form-item label="题目">
 						<i-input v-model="newQuestionList.ques2.title" placeholder="题目内容"></i-input>
-						<i-button v-if="newQuestionList.ques2.options.length<6" type="default" size="small" dtype="ques2" @click="addQuesOptions">
+						<i-button v-if="newQuestionList.ques2.options.length<6" type="default" dtype="ques2" @click="addQuesOptions">
 							增加选项
 						</i-button>
 					</form-item>

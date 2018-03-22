@@ -239,6 +239,9 @@ define(function(require, exports, module) {
 		$.ajax({
 			type: method || "POST",
 			url: inter,
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
 			data: param,
 			success: callback,
 			error: errorback || function() {

@@ -81,7 +81,7 @@ class DocumentController extends Controller
      */
     public function getTypeList()
     {
-        $result = Type::get()->pluck("_id", "proname");
+        $result = Type::get(["_id","type"]);//->pluck("type", "_id");
         return $this->resultJson($result);
     }
 

@@ -6,7 +6,6 @@ define(function(require, exports, module) {
 		avh = (window.innerHeight) ? window.innerHeight : (document.documentElement && document.documentElement.clientHeight) ? document.documentElement.clientHeight : document.body.offsetHeight;
 		avh = avh - 64 - 43;
 		getAjaxProListData();
-		getAjaxDocsTreeData(initVueObject);
 	}
 
 	function initVueObject() {
@@ -52,7 +51,7 @@ define(function(require, exports, module) {
 					//查询部分
 					keyword: '',
 					proModel: 'CE12812',
-					proModels: getProModelsTestData(),
+					proModels: proList,
 					docList: [],
 					breadcrumb: [], //文档树节点
 					//单位管理
@@ -112,7 +111,7 @@ define(function(require, exports, module) {
 													title: '删除确认',
 													content: '<p>您确定删除用户"' + params['row']['username'] + '"?</p>',
 													onOk: () => {
-														this.removeUser(params.index)
+														this.removeUser(params['row']['_id'])
 													},
 													onCancel: () => {}
 												});
@@ -322,7 +321,7 @@ define(function(require, exports, module) {
 					//如果存在_id值，就是更新用户信息，否则为添加用户信息
 					//更新用户信息的话需要修改原数据列表信息
 					//重置密码也是修改用户信息，直接生成一个简单的随机密码即可，然后提交显示给用户
-					console.log(this.user);
+					this.user._id ? ajaxEditUser(this.user) : ajaxAddUser(this.user);
 				},
 				//添加/修改用户窗口点击取消按钮
 				modelUserAddCancel: function() {
@@ -535,8 +534,9 @@ define(function(require, exports, module) {
 					//如果是用户管理就加载用户列表数据
 				},
 				//删除用户操作
-				removeUser: function() {
+				removeUser: function($_id) {
 					console.log('删除用户', arguments);
+					ajaxDelUser($_id);
 				},
 				rowClassName: function(row, index) {
 					/*if(row['status'] =='考试中'){
@@ -682,17 +682,6 @@ define(function(require, exports, module) {
 				pro: proList[parseInt(Math.random() * (plen - 1))],
 				date: Mock.mock('@datetime("yyyy-MM-dd HH:mm:ss")')
 			});
-		}
-		return arr;
-	}
-	/**
-	 * 获取产品型号列表
-	 */
-	function getProModelsTestData() {
-		var len = proList.length,
-			arr = [];
-		for(var i = 0; i < len; i++) {
-			proList[i].family == '交换机' ? arr.push(proList[i].type) : '';
 		}
 		return arr;
 	}
@@ -906,16 +895,71 @@ define(function(require, exports, module) {
 	/**
 	 * 异步获取产品型号列表
 	 */
-	function getAjaxProListData(callback) {
+	function getAjaxProListData() {
 		opt.model._ajaxGetDataInterFace({
-			inter: 'data/pro.json',
+			inter: 'document/type',
 			method: 'GET'
 		}, function(result) {
-			//console.log('返回结果',result);
+			console.log('返回结果', result);
 			if(result) {
-				proList = result;
+				proList = result.data;
 			}
-			callback && callback.call();
+			getAjaxDocsTreeData(initVueObject)
+		});
+	}
+	/**
+	 * 添加用户
+	 */
+	function ajaxAddUser($user) {
+		opt.model._ajaxGetDataInterFace({
+			inter: 'user/add',
+			method: 'POST',
+			unitid: $user['unit']['_id'],
+			username: $user['username'],
+			type: $user['type'],
+			isadmin: '0',
+			'password': $user['pw']
+		}, function(result) {
+			if(result && result.success == 1) {
+				pVue.$Message.success('添加成功');
+			} else {
+				pVue.$Message.warning('添加失败');
+			}
+		});
+	}
+	/**
+	 * 编辑用户
+	 */
+	function ajaxEditUser($user) {
+		opt.model._ajaxGetDataInterFace({
+			inter: 'user/edit/' + $user['_id'],
+			method: 'POST',
+			unitid: $user['unit']['_id'],
+			username: $user['username'],
+			type: $user['type'],
+			isadmin: '0',
+			'password': $user['pw']
+		}, function(result) {
+			if(result && result.success == 1) {
+				pVue.$Message.success('修改成功');
+			} else {
+				pVue.$Message.warning('修改失败');
+			}
+		});
+	}
+	/**
+	 * 删除用户
+	 */
+	function ajaxDelUser($_id) {
+		opt.model._ajaxGetDataInterFace({
+			inter: 'user/delete/' + $_id,
+			method: 'POST'
+		}, function(result) {
+			if(result && result.success == 1) {
+				pVue.$Message.success('删除成功');
+			} else {
+				pVue.$Message.warning('删除失败');
+			}
 		});
 	}
 	/**
