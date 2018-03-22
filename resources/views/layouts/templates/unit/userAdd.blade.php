@@ -1,17 +1,20 @@
 <template>
-	<layout>
-		<sider hide-trigger class="unit-nav-tree">
-			<tree :data="unitTree" ref="tree" @on-select-change="docMenuSelect" :style="{height:layoutContentHeight-38-11-2-11+'px'}"></tree>
-		</sider>
-		<layout>
-			<breadcrumb class="unit-breadcrumb-list" :style="{margin: '24px 0'}">
-				<breadcrumb-item v-for="(bc, ind) in unitbreadcrumb" :key="ind" v-text="bc">
-					<span class="ivu-breadcrumb-item-separator">/</span>
-				</breadcrumb-item>
-			</breadcrumb>
-			<i-content class="unit-content" :style="{padding: '0 16px', minHeight: '280px'}">
-				
-			</i-content>
-		</layout>
-	</layout>
+	<modal class="model-user-add" v-model="modalUserAdd" :title="user.username||'新增用户'" closable="false" @on-ok="modelUserAddOK" @on-cancel="modelUserAddCancel">
+		<i-form :label-width="80">
+			<form-item label="用户单位">
+				<i-input v-model="user.unit && user.unit.title" placeholder="用户单位" disabled="true"></i-input>
+			</form-item>
+			<form-item label="用户姓名">
+				<i-input v-model="user.username" placeholder="用户姓名"></i-input>
+			</form-item>
+			<form-item label="登录密码">
+				<i-input type="password" v-model="user.passwd" placeholder="登录密码"></i-input>
+			</form-item>
+			<form-item label="用户身份">
+				<i-select v-model="user.type" filterable>
+					<i-option dis-hover v-for="(item, index) in userType" :key="index" :value="item" v-text="item"></i-option>
+				</i-select>
+			</form-item>
+		</i-form>
+	</modal>
 </template>

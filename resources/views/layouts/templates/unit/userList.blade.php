@@ -4,13 +4,15 @@
 			<tree :data="unitTree" ref="tree" @on-select-change="unitSelected" :style="{height:layoutContentHeight-38-11-2-11+'px'}"></tree>
 		</sider>
 		<layout>
-			<breadcrumb class="unit-breadcrumb-list" :style="{margin: '24px 0'}">
-				<breadcrumb-item v-for="(bc, ind) in unitbreadcrumb" :key="ind" v-text="bc">
-					<span class="ivu-breadcrumb-item-separator">/</span>
-				</breadcrumb-item>
-			</breadcrumb>
 			<i-content class="unit-content" :style="{padding: '0 16px', minHeight: '280px'}">
-                <i-table border :columns="userCols" :data="userList"></i-table>
+				<row style="text-align: right;">
+					<i-col span="24" style="text-align: right;margin-bottom: 22px;">
+						<i-button @click.prevent="editUser">
+							新增
+						</i-button>
+					</i-col>
+				</row>
+				<i-table border :columns="userCols" :data="userList"></i-table>
 			</i-content>
 		</layout>
 	</layout>

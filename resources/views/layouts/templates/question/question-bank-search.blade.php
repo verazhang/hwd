@@ -4,6 +4,6 @@
 			<i-option dis-hover v-for="(item, index) in qtypes" :key="index" :value="item" v-text="item"></i-option>
 		</i-select>
 		<i-button @click.prevent="btnQuestionSearch" slot="append" icon="ios-search"></i-button>
-		<i-button slot="append" type="primary" ico="plus-round">新增</i-button>
+		<i-button slot="append" type="primary" ico="plus-round" @click.prevent="btnQuestionAdd">新增</i-button>
 	</i-input>
 </template>

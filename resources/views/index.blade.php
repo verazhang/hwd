@@ -53,6 +53,7 @@
 				<section v-if="menuID=='2-1'" class="model-question-bank">
 					@include('layouts.templates.question.question-bank-search')
 					@include('layouts.templates.question.question-list')
+					@include('layouts.templates.question.add-question')
 				</section>
 				<section v-else-if="menuID=='2-2'" class="model-question">
 					@include('layouts.templates.question.exam-nav')
@@ -88,6 +89,7 @@
 					</section>
 					<section class="model-user-list" v-else-if="menuID=='3-2'">
 						@include('layouts.templates.unit.userList')
+						@include('layouts.templates.unit.userAdd')
 					</section>
 				</section>
 			</i-content>
@@ -112,6 +114,7 @@
 <script src="./js/jquery.min.js"></script>
 <script src="./js/umeditor/umeditor.min.js"></script>
 <script src="./js/umeditor/umeditor.config.js"></script>
+<script src="./js/lib/md5.js"></script>
 <script src="./js/mock/mock-min.js"></script>
 <script>seajs.use(['./js/index.js', './js/lib/com.js'], function() {
 	var args = arguments;

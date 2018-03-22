@@ -32,6 +32,7 @@
 						</form-item>
 					</i-col>
 				</row>
+			</form-item>
 		</i-form>
 	</modal>
 </template>

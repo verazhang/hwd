@@ -273,3 +273,9 @@ body.noscroll {
 	background-color: rgba(247, 247, 247, .7);*/
 	color: rgba(247, 247, 247, 1);
 }
+
+.model-question-add .ivu-checkbox-group .ivu-checkbox-wrapper.ivu-checkbox-group-item {
+	width: 100%;
+}.model-question-add .ivu-checkbox-group,.model-question-add .ivu-radio-group {
+	padding-left: 44px;
+}

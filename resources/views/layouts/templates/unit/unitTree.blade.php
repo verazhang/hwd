@@ -14,8 +14,11 @@
 					<form-item label="单位名称">
 						<i-input v-model="unit.title" placeholder="单位名称"></i-input>
 					</form-item>
+					<form-item label="上级单位">
+						<i-input v-model="unit.title" placeholder="单位名称"></i-input>
+					</form-item>
 					<form-item>
-						<i-button type="primary">
+						<i-button type="primary" @click.prevent="btnAddUnit">
 							保存
 						</i-button>
 					</form-item>

@@ -74,8 +74,8 @@ define(function(require, exports, module) {
 						}, {
 							title: '操作',
 							key: 'action',
-							width: 150,
 							align: 'center',
+							width: 200,
 							render: (h, params) => {
 								return h('div', [
 									h('Button', {
@@ -88,7 +88,13 @@ define(function(require, exports, module) {
 										},
 										on: {
 											click: () => {
-												this.show(params.index)
+												this.modalUserAdd = true;
+												this.user['username'] = params['row']['username'];
+												this.user['_id'] = params['row']['_id'];
+												this.user['type'] = params['row']['type'];
+												//修改密码就直接将密码置为空
+												this.user['passwd'] = '';
+												this.user['pw'] = params['row']['passwd'];
 											}
 										}
 									}, '编辑'),
@@ -97,11 +103,14 @@ define(function(require, exports, module) {
 											type: 'error',
 											size: 'small'
 										},
+										style: {
+											marginRight: '5px'
+										},
 										on: {
 											click: () => {
 												this.$Modal.confirm({
 													title: '删除确认',
-													content: '<p>您确定删除该用户?</p>',
+													content: '<p>您确定删除用户"' + params['row']['username'] + '"?</p>',
 													onOk: () => {
 														this.removeUser(params.index)
 													},
@@ -109,7 +118,18 @@ define(function(require, exports, module) {
 												});
 											}
 										}
-									}, '删除')
+									}, '删除'),
+									h('Button', {
+										props: {
+											type: 'primary',
+											size: 'small'
+										},
+										on: {
+											click: () => {
+
+											}
+										}
+									}, '重置密码')
 								]);
 							}
 						}
@@ -117,12 +137,36 @@ define(function(require, exports, module) {
 					userList: getUnitUserList(), //单位对应的用户
 					unitbreadcrumb: [], //单位面包屑
 					unit: {}, //选中的单位信息
+					modalUserAdd: false, //是否显示编辑用户信息窗口
+					userType: ['老师', '一般用户'], //用户类型
+					user: {
+						type: '一般用户'
+					}, //用户信息
 					showUnitEdit: false,
 					//试题部分
 					qtype: '', //选中题型
 					qtypes: ['单选题', '多选题', '判断题', '简答题'], //题型
 					qkeywords: '', //题库管理关键字
 					questionList: getQuestionBank(), //题库资料
+					modalQuestionAdd: false,
+					newQuestionList: {
+						ques1: {
+							title: '',
+							options: []
+						},
+						ques2: {
+							title: '',
+							options: []
+						},
+						ques3: {
+							title: '',
+							options: []
+						},
+						ques4: {
+							title: '',
+							content: ''
+						}
+					}, //新增题目
 					meExaminationStartDate: '', //考试开始时间
 					meExaminationEndDate: '', //考试结束时间
 					//meExaminationList: getMeExaminationList(), //我的试卷列表
@@ -261,6 +305,32 @@ define(function(require, exports, module) {
 					this.$nextTick(function() {
 						this.spinShow = false;
 					});
+				},
+				editUser: function() {
+					this.modalUserAdd = true;
+					//将原用户信息置空
+					this.user['username'] = '';
+					this.user['_id'] = '';
+					this.user['type'] = '';
+					this.user['passwd'] = '';
+					this.user['pw'] = '';
+				},
+				//添加/修改用户窗口点击确定按钮
+				modelUserAddOK: function() {
+					//提交的时候需要将用户密码进行md5加密
+					this.user.pw = hex_md5(this.user.passwd);
+					//如果存在_id值，就是更新用户信息，否则为添加用户信息
+					//更新用户信息的话需要修改原数据列表信息
+					//重置密码也是修改用户信息，直接生成一个简单的随机密码即可，然后提交显示给用户
+					console.log(this.user);
+				},
+				//添加/修改用户窗口点击取消按钮
+				modelUserAddCancel: function() {
+
+				},
+				//添加/修改单位
+				btnAddUnit: function() {
+
 				},
 				examTableCols: function() {
 					this.examCols = [{
@@ -411,6 +481,23 @@ define(function(require, exports, module) {
 				meExamTableData: function() {
 					this.examList = getQuestionDoc();
 				},
+				//添加题目
+				addQuesOptions: function(e) {
+					var tar = e.currentTarget,
+						dtype = tar.getAttribute('dtype');
+					this.newQuestionList[dtype].options.push({
+						projectnum: ['A', 'B', 'C', 'D', 'E', 'F'][this.newQuestionList[dtype].options.length],
+						title: '测试数据'
+					});
+				},
+				//点击添加题目按钮显示添加界面
+				btnQuestionAdd: function() {
+					this.modalQuestionAdd = true;
+				},
+				//添加题目确定按钮
+				modelQuestionAddOK: function() {},
+				//添加题目取消按钮
+				modelQuestionAddCancel: function() {},
 				//文档菜单节点选中事件
 				docMenuSelect: function(node) {
 					var tr = this.$refs.tree,
@@ -443,6 +530,7 @@ define(function(require, exports, module) {
 				//单位选中
 				unitSelected: function(n) {
 					this.unit = n[0];
+					this.user['unit'] = this.unit;
 					this.userList = getUnitUserList();
 					//如果是用户管理就加载用户列表数据
 				},
