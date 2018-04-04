@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\Exam;
 use App\Models\ExamContent;
 use App\Models\ExamResult;
+use Log;
 
 class ExamController extends Controller
 {
@@ -21,12 +22,12 @@ class ExamController extends Controller
         foreach ($items as $param) {
             $values[$param] = request($param);
         }
-
+		Log::info("添加题目".json_encode($values));
         $values['status'] = ExamContent::STATUS_CREATE;
         //@todo
         $values['user_id'] = 0;
         $model = new ExamContent();
-
+		
         $model->setRawAttributes($values);
         $result = $model->save();
         return $this->getBoolResult($result);

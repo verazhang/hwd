@@ -14,4 +14,12 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         //
     ];
+	//解决ajax 报419 unknown status错误问题
+	public function handle($request, \Closure $next){
+	    // 使用CSRF
+	    //return parent::handle($request, $next);
+	    // 禁用CSRF
+	    return $next($request);
+	}
+	
 }

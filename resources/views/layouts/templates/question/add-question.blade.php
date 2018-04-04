@@ -1,5 +1,5 @@
 <template>
-	<modal class="model-question-add" v-model="modalQuestionAdd" :title="'新增题目'" closable="false" @on-ok="modelQuestionAddOK" @on-cancel="modelQuestionAddCancel">
+	<modal class="model-question-add" v-model="modalQuestionAdd" :title="'新增题目'" closable="false" @on-ok="modelQuestionAddOK" ok-text="保存全部" @on-cancel="modelQuestionAddCancel">
 		<tabs value="ques1">
 			<tab-pane label="单选题" name="ques1">
 				<i-form :label-width="80">
@@ -9,8 +9,10 @@
 							增加选项
 						</i-button>
 					</form-item>
-					<radio-group vertical>
-						<radio v-for="(pcn, i) in newQuestionList.ques1.options" :label="pcn.projectnum + '、' + pcn.title"></radio>
+					<radio-group vertical v-model="ques1Option">
+						<radio v-for="(pcn, i) in newQuestionList.ques1.options" :label="pcn.projectnum">
+							<span v-text="pcn.projectnum + '、' + pcn.title"></span>
+						</radio>
 					</radio-group>
 				</i-form>
 			</tab-pane>
@@ -22,8 +24,10 @@
 							增加选项
 						</i-button>
 					</form-item>
-					<checkbox-group>
-						<checkbox v-for="(pcn, i) in newQuestionList.ques2.options" :label="pcn.projectnum + '、' + pcn.title"></checkbox>
+					<checkbox-group v-model="ques2Option">
+						<checkbox v-for="(pcn, i) in newQuestionList.ques2.options" :label="pcn.projectnum">
+							<span v-text="pcn.projectnum + '、' + pcn.title"></span>
+						</checkbox>
 					</checkbox-group>
 				</i-form>
 			</tab-pane>

@@ -31,6 +31,9 @@
 					<menu-item name="3-2">
 						用户管理
 					</menu-item>
+					<menu-item name="3-3">
+						系统管理<!-- 数据导入管理  -->
+					</menu-item>
 				</menu-group>
 			</i-menu>
 		</i-col>

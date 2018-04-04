@@ -166,6 +166,9 @@ define(function(require, exports, module) {
 							content: ''
 						}
 					}, //新增题目
+					newQuestionOption: '', //选项内容
+					ques1Option:'',//单选题选中题目
+					ques2Option:[],//多选题选中
 					meExaminationStartDate: '', //考试开始时间
 					meExaminationEndDate: '', //考试结束时间
 					//meExaminationList: getMeExaminationList(), //我的试卷列表
@@ -480,21 +483,58 @@ define(function(require, exports, module) {
 				meExamTableData: function() {
 					this.examList = getQuestionDoc();
 				},
+				showAddQuesOptionsModel: function(dtype) {
+					this.$Modal.confirm({
+						render: (h) => {
+							return h('Input', {
+								props: {
+									value: this.newQuestionOption,
+									autofocus: true,
+									placeholder: '请输入选项内容'
+								},
+								on: {
+									input: (val) => {
+										this.newQuestionOption = val;
+
+									}
+								}
+							});
+						},
+						onOk: function() {
+							pVue.newQuestionList[dtype].options.push({
+								projectnum: ['A', 'B', 'C', 'D', 'E', 'F'][pVue.newQuestionList[dtype].options.length],
+								title: pVue.newQuestionOption
+							});
+							pVue.newQuestionOption = '';
+						}
+					});
+				},
 				//添加题目
 				addQuesOptions: function(e) {
 					var tar = e.currentTarget,
 						dtype = tar.getAttribute('dtype');
-					this.newQuestionList[dtype].options.push({
-						projectnum: ['A', 'B', 'C', 'D', 'E', 'F'][this.newQuestionList[dtype].options.length],
-						title: '测试数据'
-					});
+					this.showAddQuesOptionsModel(dtype);
 				},
 				//点击添加题目按钮显示添加界面
 				btnQuestionAdd: function() {
 					this.modalQuestionAdd = true;
 				},
 				//添加题目确定按钮
-				modelQuestionAddOK: function() {},
+				modelQuestionAddOK: function() {
+					var nql = this.newQuestionList,nqlopts=[];
+					for(var nq in nql) {
+						if(nql[nq].title) {
+							nqlopts = [].slice.call(nql[nq].options,0);
+							ajaxAddExam({
+								type: nq.replace('ques', ''),
+								title: nql[nq].title,
+								content: nql[nq].content || '',
+								options: nql[nq].options || '',
+								'option': this[nq + 'Option']
+							});
+						}
+					}
+				},
 				//添加题目取消按钮
 				modelQuestionAddCancel: function() {},
 				//文档菜单节点选中事件
@@ -535,7 +575,6 @@ define(function(require, exports, module) {
 				},
 				//删除用户操作
 				removeUser: function($_id) {
-					console.log('删除用户', arguments);
 					ajaxDelUser($_id);
 				},
 				rowClassName: function(row, index) {
@@ -959,6 +998,26 @@ define(function(require, exports, module) {
 				pVue.$Message.success('删除成功');
 			} else {
 				pVue.$Message.warning('删除失败');
+			}
+		});
+	}
+	/**
+	 * 添加题目
+	 */
+	function ajaxAddExam($data) {
+		opt.model._ajaxGetDataInterFace({
+			inter: 'examcontent/add',
+			method: 'POST',
+			type: $data['type'],
+			title: $data['title'],
+			content: $data['content'],
+			options: $data['options'],
+			'option': $data['option']
+		}, function(result) {
+			if(result && result.success == 1) {
+				pVue.$Message.success('添加成功');
+			} else {
+				pVue.$Message.warning('添加失败');
 			}
 		});
 	}
